@@ -49,7 +49,7 @@ const doctorSchema = new mongoose.Schema(
     },
     availability: {
       type: Boolean,
-      required: true,
+      default: true,
     },
     fees: {
       type: Number,
@@ -71,7 +71,7 @@ const doctorSchema = new mongoose.Schema(
   { minimize: false, timestamps: true }
 );
 
-doctorSchema.pre("save", async (next) => {
+doctorSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
   // hash password

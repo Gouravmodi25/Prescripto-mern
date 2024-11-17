@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    minlength: 8,
   },
   profile_image: {
     type: String,
@@ -41,6 +42,7 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     default: "1234567890",
+    maxlength: 10,
   },
 });
 
