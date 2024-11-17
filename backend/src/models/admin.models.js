@@ -1,4 +1,5 @@
-const mongoose = require("express");
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const adminSchema = new mongoose.Schema({
   fullName: {
@@ -16,6 +17,7 @@ const adminSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    minlength: 8,
     trim: true,
   },
 });
@@ -28,6 +30,6 @@ adminSchema.pre("save", async function (next) {
   next();
 });
 
-const adminModel = mongoose.model("Admin", adminSchema);
+const AdminModel = mongoose.model("Admin", adminSchema);
 
-module.exports = adminModel;
+module.exports = AdminModel;

@@ -4,6 +4,7 @@ const ApiError = require("../utils/ApiError.js");
 const ApiResponse = require("../utils/ApiResponse.js");
 const validator = require("validator");
 const uploadOnCloudinary = require("../utils/uploadOnCLoudinary.js");
+const AdminModel = require("../models/admin.models.js");
 
 // controller for adding doctors
 const addDoctor = asyncHandler(async (req, res) => {
@@ -120,6 +121,60 @@ const addDoctor = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Doctor added successfully", createDoctor));
 });
 
+// register admin endpoint
+const registerAdminAccount = asyncHandler(async (req, res, next) => {
+  const { fullName, email, password } = req.body;
+
+  if (
+    [fullName, email, password].some(
+      (item) => String(item || "")?.trim() === ""
+    )
+  ) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "All Fields are required"));
+  }
+
+  if (!validator.isEmail(email)) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Email is Valid Please Enter valid Email"));
+  }
+
+  const existedAdmin = await AdminModel.findOne({ $or: [{ email }] });
+
+  if (existedAdmin) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Admin Already Registered"));
+  }
+
+  if (password.length < 8) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Password should be strong "));
+  }
+
+  const admin = await AdminModel.create({
+    fullName,
+    email,
+    password,
+  });
+
+  const createAdmin = await AdminModel.findById(admin._id).select("-password");
+
+  if (!createAdmin) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Error while Registering Admin"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Admin Register successfully", createAdmin));
+});
+
 module.exports = {
   addDoctor,
+  registerAdminAccount,
 };
