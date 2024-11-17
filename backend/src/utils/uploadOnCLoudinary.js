@@ -25,3 +25,5 @@ const uploadOnCLoudinary = async function (localFIlePath) {
     return null;
   }
 };
+
+module.exports = uploadOnCLoudinary;
