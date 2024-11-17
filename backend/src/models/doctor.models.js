@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const doctorSchema = new mongoose.Schema(
   {
@@ -69,6 +70,22 @@ const doctorSchema = new mongoose.Schema(
   },
   { minimize: false, timestamps: true }
 );
+
+doctorSchema.pre("save", async (next) => {
+  if (!this.isModified("password")) return next();
+
+  // hash password
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+doctorSchema.methods.isSamePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+doctorSchema.methods.isCorrectPassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 
 const DoctorModel = mongoose.model("Doctors", doctorSchema);
 
