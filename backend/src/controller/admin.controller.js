@@ -6,6 +6,19 @@ const validator = require("validator");
 const uploadOnCloudinary = require("../utils/uploadOnCLoudinary.js");
 const AdminModel = require("../models/admin.models.js");
 
+// generate access token for admin
+const generateToken = async function (admin_id) {
+  try {
+    const admin = await AdminModel.findOne({ _id: admin_id });
+    const accessToken = admin.generateToken();
+    admin.accessToken = accessToken;
+    await admin.save({ validationBeforeSave: false });
+    return accessToken;
+  } catch (error) {
+    throw new ApiError(400, "Something went wrong while generating token");
+  }
+};
+
 // controller for adding doctors
 const addDoctor = asyncHandler(async (req, res) => {
   console.log(req.body);
@@ -174,7 +187,46 @@ const registerAdminAccount = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse(200, "Admin Register successfully", createAdmin));
 });
 
+// login admin endpoint
+
+const loginAdmin = asyncHandler(async function (req, res) {
+  const { email, password } = req.body;
+
+  if ([email, password].some((item) => String(item || "").trim() === "")) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "All fields are required"));
+  }
+  if (!validator.isEmail(email)) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Please Enter valid email"));
+  }
+
+  const admin = await AdminModel.findOne({ $or: [{ email }] });
+
+  if (!admin) {
+    return res.status(400).json(new ApiResponse(400, "Invalid Credentials"));
+  }
+
+  const isCorrectPassword = await admin.isCorrectPassword(password);
+
+  if (!isCorrectPassword) {
+    return res.status(400).json(new ApiResponse(400, "Password is incorrect"));
+  }
+
+  const accessToken = await generateToken(admin._id);
+
+  return res.status(200).json(
+    new ApiResponse(200, "Admin Logged In SuccessFully", {
+      admin,
+      accessToken,
+    })
+  );
+});
+
 module.exports = {
   addDoctor,
   registerAdminAccount,
+  loginAdmin,
 };
