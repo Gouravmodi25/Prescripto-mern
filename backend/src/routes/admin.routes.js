@@ -3,6 +3,7 @@ const upload = require("../middlewares/multer.middleware.js");
 const {
   addDoctor,
   registerAdminAccount,
+  loginAdmin,
 } = require("../controller/admin.controller.js");
 
 // admin router
@@ -16,5 +17,8 @@ adminRouter
 
 // admin register endpoint
 adminRouter.route("/register-admin").post(registerAdminAccount);
+
+// admin Login endpoint
+adminRouter.route("/admin-loggedIn").post(loginAdmin);
 
 module.exports = adminRouter;
