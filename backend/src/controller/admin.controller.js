@@ -212,7 +212,9 @@ const loginAdmin = asyncHandler(async function (req, res) {
   const isCorrectPassword = await admin.isCorrectPassword(password);
 
   if (!isCorrectPassword) {
-    return res.status(400).json(new ApiResponse(400, "Password is incorrect"));
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Entered Password is incorrect"));
   }
 
   const accessToken = await generateToken(admin._id);
