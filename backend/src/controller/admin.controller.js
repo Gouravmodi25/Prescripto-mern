@@ -234,8 +234,67 @@ const loginAdmin = asyncHandler(async function (req, res) {
   );
 });
 
+const logoutAdmin = asyncHandler(async function (req, res) {
+  const admin = await AdminModel.findByIdAndUpdate(
+    req.admin._id,
+    {
+      $unset: {
+        accessToken: 1,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, "User Logged out", admin));
+});
+
+const changeAdminPassword = asyncHandler(async function (req, res) {
+  const { oldPassword, newPassword } = req.body;
+
+  const admin = await AdminModel.findById(req.admin._id).select("+password");
+
+  const isAdminPasswordCorrect = await admin.isCorrectPassword(oldPassword);
+
+  if (!isAdminPasswordCorrect) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Old Password is incorrect"));
+  }
+
+  const isSamePassword = await admin.isSamePassword(newPassword);
+
+  if (isSamePassword) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(400, "New Password should not same as old Password")
+      );
+  }
+
+  admin.password = newPassword;
+  await admin.save({ validateBeforeSave: false });
+
+  const newAdmin = await AdminModel.findById(req.admin._id).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Password Changed Successfully", newAdmin));
+});
+
 module.exports = {
   addDoctor,
   registerAdminAccount,
   loginAdmin,
+  logoutAdmin,
+  changeAdminPassword,
 };

@@ -2,13 +2,16 @@ const jwt = require("jsonwebtoken");
 const asyncHandler = require("../utils/asyncHandler.js");
 const ApiError = require("../utils/ApiError.js");
 const AdminModel = require("../models/admin.models.js");
+const ApiResponse = require("../utils/ApiResponse.js");
 
-const adminAuthentication = asyncHandler(async function (req, _, next) {
+const adminAuthentication = asyncHandler(async function (req, res, next) {
   try {
     const token = req.header("Authorization") || req.cookies?.accessToken;
 
     if (!token) {
-      throw new ApiError("401", "Unauthorized Request");
+      return res
+        .status(401)
+        .json(new ApiResponse(401, "Not Authorized Login Again"));
     }
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
@@ -18,13 +21,17 @@ const adminAuthentication = asyncHandler(async function (req, _, next) {
     );
 
     if (!loggedInAdmin) {
-      throw new ApiError(401, "Invalid access token");
+      return res
+        .status(401)
+        .json(new ApiResponse(401, "Not Authorized Login Again"));
     }
 
     req.admin = loggedInAdmin;
     next();
   } catch (error) {
-    throw new ApiError(401, error?.message || "Invalid access token");
+    return res
+      .status(401)
+      .json(new ApiResponse(401, "Not Authorized Login Again"));
   }
 });
 

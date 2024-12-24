@@ -38,6 +38,10 @@ adminSchema.methods.isCorrectPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
+adminSchema.methods.isSamePassword = async function (newPassword) {
+  return await bcrypt.compare(newPassword, this.password);
+};
+
 adminSchema.methods.generateToken = function () {
   return jwt.sign(
     {

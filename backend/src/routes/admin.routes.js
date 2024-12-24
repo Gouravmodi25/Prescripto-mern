@@ -4,6 +4,8 @@ const {
   addDoctor,
   registerAdminAccount,
   loginAdmin,
+  logoutAdmin,
+  changeAdminPassword,
 } = require("../controller/admin.controller.js");
 const adminAuthentication = require("../middlewares/adminAuth.middleware.js");
 
@@ -21,5 +23,11 @@ adminRouter.route("/register-admin").post(registerAdminAccount);
 
 // admin Login endpoint
 adminRouter.route("/admin-loggedIn").post(loginAdmin);
+
+adminRouter.route("/admin-loggedOut").post(adminAuthentication, logoutAdmin);
+
+adminRouter
+  .route("/admin-changePassword")
+  .post(adminAuthentication, changeAdminPassword);
 
 module.exports = adminRouter;
