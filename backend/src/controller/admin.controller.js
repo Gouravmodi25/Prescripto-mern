@@ -219,9 +219,16 @@ const loginAdmin = asyncHandler(async function (req, res) {
 
   const accessToken = await generateToken(admin._id);
 
-  return res.status(200).json(
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  const loggedAdmin = await AdminModel.findById(admin._id).select("-password");
+
+  return res.status(200).cookie("accessToken", accessToken, options).json(
     new ApiResponse(200, "Admin Logged In SuccessFully", {
-      admin,
+      loggedAdmin,
       accessToken,
     })
   );
