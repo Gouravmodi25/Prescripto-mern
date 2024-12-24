@@ -17,6 +17,10 @@ const adminAuthentication = asyncHandler(async function (req, _, next) {
       "-password"
     );
 
+    if (!loggedInAdmin) {
+      throw new ApiError(401, "Invalid access token");
+    }
+
     req.admin = loggedInAdmin;
     next();
   } catch (error) {

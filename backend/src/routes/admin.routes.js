@@ -5,6 +5,7 @@ const {
   registerAdminAccount,
   loginAdmin,
 } = require("../controller/admin.controller.js");
+const adminAuthentication = require("../middlewares/adminAuth.middleware.js");
 
 // admin router
 
@@ -13,7 +14,7 @@ const adminRouter = Router();
 // add doctor endpoint
 adminRouter
   .route("/add-doctor")
-  .post(upload.single("profile_image"), addDoctor);
+  .post(adminAuthentication, upload.single("profile_image"), addDoctor);
 
 // admin register endpoint
 adminRouter.route("/register-admin").post(registerAdminAccount);
