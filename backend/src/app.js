@@ -9,12 +9,22 @@ const app = express();
 
 // cors middleware
 
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  })
-);
+const allowedOrigins = ["http://localhost:5174", "http://localhost:5173"]; // Add your allowed origins here
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // Allow credentials
+};
+
+app.use(cors(corsOptions));
+
+app.options("*", cors());
 
 app.use(express.json({ limit: "20kb" }));
 

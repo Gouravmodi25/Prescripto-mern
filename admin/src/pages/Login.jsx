@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { AdminContext } from "../context/AdminContext";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [state, setState] = useState("Sign up");
@@ -14,20 +15,57 @@ const Login = () => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
-    if (state === "Login" && adminState === "Admin") {
-      const data = await axios.post(`${backendUrl}/api/admin/admin-loggedIn`, {
-        email: String(email),
-        password: String(password),
-      });
-      console.log(data.data.data);
-    }
-    if (state === "Sign up" && adminState === "Admin") {
-      const data = await axios.post(`${backendUrl}/api/admin/register-admin`, {
-        fullName: String(name),
-        email: String(email),
-        password: String(password),
-      });
-      console.log(data.data.data);
+    try {
+      if (state === "Login" && adminState === "Admin") {
+        const data = await axios.post(
+          `${backendUrl}/api/admin/admin-loggedIn`,
+          {
+            email: String(email),
+            password: String(password),
+          },
+          {
+            withCredentials: true, // Ensures the cookie is sent with the request
+          }
+        );
+        console.log(data);
+        if (data.data.success) {
+          localStorage.setItem("access-token", data.data.data.accessToken);
+          setAccessToken(data.data.data.accessToken);
+          toast.success(data.data.message);
+          console.log(data.data.data);
+        } else {
+          toast.error(data.data.message);
+        }
+      }
+      if (state === "Sign up" && adminState === "Admin") {
+        const data = await axios.post(
+          `${backendUrl}/api/admin/register-admin`,
+          {
+            fullName: String(name),
+            email: String(email),
+            password: String(password),
+          },
+          {
+            withCredentials: true, // Ensures the cookie is sent with the request
+          }
+        );
+        console.log(data.data.message);
+        const cookie = Cookies.get("accessToken");
+        console.log(cookie);
+        if (data.data.success) {
+          localStorage.setItem("access-token", data.data.data.accessToken);
+          setAccessToken(data.data.data.accessToken);
+          toast.success(data.data.message);
+          console.log(data);
+        } else {
+          toast.error(data.data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
     }
   };
 
