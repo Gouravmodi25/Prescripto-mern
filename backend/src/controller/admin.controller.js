@@ -174,7 +174,17 @@ const registerAdminAccount = asyncHandler(async (req, res, next) => {
     password,
   });
 
+  const accessToken = await generateToken(admin._id);
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
   const createAdmin = await AdminModel.findById(admin._id).select("-password");
+
+  createAdmin.accessToken = accessToken;
+  await createAdmin.save({ validateBeforeSave: true });
 
   if (!createAdmin) {
     return res
@@ -184,6 +194,7 @@ const registerAdminAccount = asyncHandler(async (req, res, next) => {
 
   return res
     .status(200)
+    .cookie("accessToken", accessToken, options)
     .json(new ApiResponse(200, "Admin Register successfully", createAdmin));
 });
 
