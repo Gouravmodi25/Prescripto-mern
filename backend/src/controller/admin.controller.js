@@ -252,6 +252,12 @@ const forgotPassword = asyncHandler(async function (req, res) {
     return res.status(400).json(new ApiResponse(400, "Email is required"));
   }
 
+  if (!validator.isEmail(email)) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Email is Valid Please Enter valid Email"));
+  }
+
   const admin = await AdminModel.findOne({ email });
 
   if (!admin) {

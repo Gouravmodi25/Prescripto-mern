@@ -166,7 +166,10 @@ const Login = () => {
           </p>
         ) : (
           <div>
-            <p className="text-primary cursor-pointer pb-3">Change Password</p>
+            <p className=" pb-3">
+              Reset Password?{" "}
+              <span className="text-primary cursor-pointer">Click here</span>{" "}
+            </p>
             <p>
               Create an new account?{" "}
               <span
