@@ -6,6 +6,7 @@ const validator = require("validator");
 const uploadOnCloudinary = require("../utils/uploadOnCLoudinary.js");
 const AdminModel = require("../models/admin.models.js");
 const sendEmail = require("../utils/sendMail.js");
+const crypto = require("crypto");
 
 // generate access token for admin
 const generateToken = async function (admin_id) {
@@ -270,23 +271,82 @@ const forgotPassword = asyncHandler(async function (req, res) {
       <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
     `;
   try {
-    const data = await sendEmail({
+    await sendEmail({
       to: admin.email,
       subject: "Password Reset Request",
       text: message,
     });
+
+    const newAdmin = await AdminModel.findById(admin._id).select("-password");
+
     return res
       .status(200)
-      .json(new ApiResponse(200, "Email sent successfully", data));
+      .json(new ApiResponse(200, "Email sent successfully", newAdmin));
   } catch (error) {
     admin.resetPasswordToken = undefined;
     user.resetPasswordTokenExpiry = undefined;
-    await user.save();
+    await user.save({ validationBeforeSave: false });
 
     return res
       .status(500)
       .json(new ApiResponse(500, "Email could not be sent"));
   }
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { newPassword, confirmNewPassword } = req.body;
+
+  if (
+    [newPassword, confirmNewPassword].some(
+      (item) => String(item || "").trim() === ""
+    )
+  ) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "All fields are required"));
+  }
+
+  if (newPassword.length < 8) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(400, "Password must be at least 8 characters long")
+      );
+  }
+
+  if (newPassword !== confirmNewPassword) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Both password should be same"));
+  }
+
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.resetToken)
+    .digest("hex");
+
+  const admin = await AdminModel.findOne({
+    resetPasswordToken,
+    resetPasswordTokenExpiry: { $gt: Date.now() },
+  });
+
+  console.log(resetPasswordToken);
+
+  if (!admin) {
+    return res.status(400).json(new ApiResponse(400, "Invalid Reset Token"));
+  }
+
+  admin.password = newPassword;
+  admin.resetPasswordToken = undefined;
+  admin.resetPasswordTokenExpiry = undefined;
+
+  await admin.save({ validateBeforeSave: false });
+
+  const newAdmin = await AdminModel.findById(admin._id).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Password Changed Successfully", newAdmin));
 });
 
 const logoutAdmin = asyncHandler(async function (req, res) {
@@ -352,4 +412,5 @@ module.exports = {
   logoutAdmin,
   changeAdminPassword,
   forgotPassword,
+  resetPassword,
 };
