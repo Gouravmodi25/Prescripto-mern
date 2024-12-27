@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { AdminContext } from "../context/AdminContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 const Login = () => {
   const [state, setState] = useState("Sign up");
@@ -10,7 +11,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const { setAccessToken, backendUrl } = useContext(AdminContext);
+  const { setCookie, backendUrl } = useContext(AdminContext);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -27,10 +28,12 @@ const Login = () => {
             withCredentials: true, // Ensures the cookie is sent with the request
           }
         );
+        const cookie = Cookies.get("accessToken");
+        console.log(cookie);
         console.log(data);
         if (data.data.success) {
-          localStorage.setItem("access-token", data.data.data.accessToken);
-          setAccessToken(data.data.data.accessToken);
+          localStorage.setItem("access-token", cookie);
+          setCookie(cookie);
           toast.success(data.data.message);
           console.log(data.data.data);
         } else {
@@ -49,12 +52,13 @@ const Login = () => {
             withCredentials: true, // Ensures the cookie is sent with the request
           }
         );
-        console.log(data.data.message);
         const cookie = Cookies.get("accessToken");
         console.log(cookie);
+
+        console.log(data.data.message);
         if (data.data.success) {
-          localStorage.setItem("access-token", data.data.data.accessToken);
-          setAccessToken(data.data.data.accessToken);
+          localStorage.setItem("access-token", cookie);
+          setCookie(cookie);
           toast.success(data.data.message);
           console.log(data);
         } else {

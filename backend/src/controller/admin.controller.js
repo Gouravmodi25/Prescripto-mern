@@ -5,6 +5,7 @@ const ApiResponse = require("../utils/ApiResponse.js");
 const validator = require("validator");
 const uploadOnCloudinary = require("../utils/uploadOnCLoudinary.js");
 const AdminModel = require("../models/admin.models.js");
+const sendEmail = require("../utils/sendMail.js");
 
 // generate access token for admin
 const generateToken = async function (admin_id) {
@@ -177,7 +178,6 @@ const registerAdminAccount = asyncHandler(async (req, res, next) => {
   const accessToken = await generateToken(admin._id);
 
   const options = {
-    httpOnly: true,
     secure: true,
   };
 
@@ -231,7 +231,6 @@ const loginAdmin = asyncHandler(async function (req, res) {
   const accessToken = await generateToken(admin._id);
 
   const options = {
-    httpOnly: true,
     secure: true,
   };
 
@@ -243,6 +242,51 @@ const loginAdmin = asyncHandler(async function (req, res) {
       accessToken,
     })
   );
+});
+
+const forgotPassword = asyncHandler(async function (req, res) {
+  const { email } = req.body;
+
+  if (email.trim() === "") {
+    return res.status(400).json(new ApiResponse(400, "Email is required"));
+  }
+
+  const admin = await AdminModel.findOne({ email });
+
+  if (!admin) {
+    return res.status(400).json(new ApiResponse(404, "Invalid Email"));
+  }
+
+  const resetToken = admin.getResetPasswordToken();
+
+  await admin.save({ validateBeforeSave: true });
+
+  const resetUrl = `http://localhost:5000/api/admin/resetPassword/${resetToken}`;
+
+  const message = `
+      <h1>This message is from Prescripto Project</h1>
+      <h3>You have requested to reset your password</h3>
+      <p>Please go to this link to reset your password</p>
+      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+    `;
+  try {
+    const data = await sendEmail({
+      to: admin.email,
+      subject: "Password Reset Request",
+      text: message,
+    });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Email sent successfully", data));
+  } catch (error) {
+    admin.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpiry = undefined;
+    await user.save();
+
+    return res
+      .status(500)
+      .json(new ApiResponse(500, "Email could not be sent"));
+  }
 });
 
 const logoutAdmin = asyncHandler(async function (req, res) {
@@ -258,7 +302,6 @@ const logoutAdmin = asyncHandler(async function (req, res) {
     }
   ).select("-password");
   const options = {
-    httpOnly: true,
     secure: true,
   };
 
@@ -308,4 +351,5 @@ module.exports = {
   loginAdmin,
   logoutAdmin,
   changeAdminPassword,
+  forgotPassword,
 };

@@ -6,6 +6,7 @@ const {
   loginAdmin,
   logoutAdmin,
   changeAdminPassword,
+  forgotPassword,
 } = require("../controller/admin.controller.js");
 const adminAuthentication = require("../middlewares/adminAuth.middleware.js");
 
@@ -29,5 +30,7 @@ adminRouter.route("/admin-loggedOut").post(adminAuthentication, logoutAdmin);
 adminRouter
   .route("/admin-changePassword")
   .post(adminAuthentication, changeAdminPassword);
+
+adminRouter.route("/admin-forgotPassword").post(forgotPassword);
 
 module.exports = adminRouter;

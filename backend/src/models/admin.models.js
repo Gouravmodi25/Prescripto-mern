@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const adminSchema = new mongoose.Schema({
   fullName: {
@@ -23,6 +24,12 @@ const adminSchema = new mongoose.Schema({
   },
   accessToken: {
     type: String,
+  },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordTokenExpiry: {
+    type: Date,
   },
 });
 
@@ -52,6 +59,17 @@ adminSchema.methods.generateToken = function () {
       expiresIn: "3d",
     }
   );
+};
+
+adminSchema.methods.getResetPasswordToken = function () {
+  const resetToken = crypto.randomBytes(20).toString("hex");
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.resetPasswordTokenExpiry = Date.now() + 10 * (60 * 1000);
+  return resetToken;
 };
 
 const AdminModel = mongoose.model("Admin", adminSchema);
