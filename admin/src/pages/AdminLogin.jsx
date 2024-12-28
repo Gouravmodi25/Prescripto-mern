@@ -4,9 +4,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 
-const Login = () => {
+const AdminLogin = () => {
   const [state, setState] = useState("Sign up");
-  const [adminState, setAdminState] = useState("Admin");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +16,7 @@ const Login = () => {
     event.preventDefault();
 
     try {
-      if (state === "Login" && adminState === "Admin") {
+      if (state === "Login") {
         const data = await axios.post(
           `${backendUrl}/api/admin/admin-loggedIn`,
           {
@@ -40,7 +39,7 @@ const Login = () => {
           toast.error(data.data.message);
         }
       }
-      if (state === "Sign up" && adminState === "Admin") {
+      if (state === "Sign up") {
         const data = await axios.post(
           `${backendUrl}/api/admin/register-admin`,
           {
@@ -83,9 +82,7 @@ const Login = () => {
       className="min-h-[80vh] flex items-center">
       <div className="flex flex-col gap-3 m-auto border  items-start p-8 min-w-[340px] sm:min-w-96 rounded-xl text-zinc-600 text-sm shadow-lg">
         <p className="text-2xl font-semibold m-auto">
-          <span className="text-primary">
-            {adminState == "Admin" ? "Admin" : "Doctor"}{" "}
-          </span>
+          <span className="text-primary">Admin</span>
           {state == "Sign up" ? "Create account" : "Login"}{" "}
         </p>
 
@@ -136,25 +133,6 @@ const Login = () => {
         <button className="bg-primary text-base rounded-lg w-full p-2 text-white  outline-none">
           {state == "Sign up" ? "Create Account" : "Login"}
         </button>
-        {adminState == "Admin" ? (
-          <p className="">
-            Doctor Login?{" "}
-            <span
-              className="text-primary cursor-pointer "
-              onClick={() => setAdminState("Doctor")}>
-              Click Here
-            </span>
-          </p>
-        ) : (
-          <p>
-            Admin Login?{" "}
-            <span
-              className="text-primary cursor-pointer "
-              onClick={() => setAdminState("Admin")}>
-              Click Here
-            </span>
-          </p>
-        )}
         {state == "Sign up" ? (
           <p>
             Already have an account?{" "}
@@ -167,7 +145,7 @@ const Login = () => {
         ) : (
           <div>
             <p className=" pb-3">
-              Reset Password?{" "}
+              Forgot Password?{" "}
               <span className="text-primary cursor-pointer">Click here</span>{" "}
             </p>
             <p>
@@ -185,4 +163,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AdminLogin;
