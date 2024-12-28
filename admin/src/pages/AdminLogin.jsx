@@ -3,6 +3,7 @@ import { AdminContext } from "../context/AdminContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+import { Link } from "react-router-dom";
 
 const AdminLogin = () => {
   const [state, setState] = useState("Sign up");
@@ -146,7 +147,11 @@ const AdminLogin = () => {
           <div>
             <p className=" pb-3">
               Forgot Password?{" "}
-              <span className="text-primary cursor-pointer">Click here</span>{" "}
+              <Link
+                to="/forgot-password"
+                className="text-primary cursor-pointer">
+                Click here
+              </Link>{" "}
             </p>
             <p>
               Create an new account?{" "}
