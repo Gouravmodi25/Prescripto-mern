@@ -40,7 +40,7 @@ const Navbar = () => {
       <div className="flex items-center gap-2 text-xs">
         <img className="w-36 sm:w-40 cursor-pointer" src={assets.admin_logo} />
         <p className="border rounded-full px-2.5 py-0.5 border-gray-500 text-gray-600">
-          {cookie ? "Admin" : "Doctor"}
+          Admin
         </p>
       </div>
       <button

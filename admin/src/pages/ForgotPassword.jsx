@@ -11,16 +11,21 @@ const ForgotPassword = () => {
   const onSubmitHandler = async function (event) {
     event.preventDefault();
 
-    const data = await axios.post(
-      `${backendUrl}/api/admin/admin-forgotPassword`,
-      { email: String(email) }
-    );
+    try {
+      const data = await axios.post(
+        `${backendUrl}/api/admin/admin-forgotPassword`,
+        { email: String(email) }
+      );
 
-    if (data.data.success) {
-      toast.success(data.data.message);
-      console.log(data.data.data);
-    } else {
-      toast.error(data.data.message);
+      if (data.data.success) {
+        toast.success(data.data.message);
+        setEmail("");
+        console.log(data.data.data);
+      } else {
+        toast.error(data.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
     }
   };
 

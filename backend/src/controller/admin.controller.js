@@ -268,7 +268,7 @@ const forgotPassword = asyncHandler(async function (req, res) {
 
   await admin.save({ validateBeforeSave: true });
 
-  const resetUrl = `http://localhost:5000/api/admin/resetPassword/${resetToken}`;
+  const resetUrl = `http://localhost:5174/reset-password/${resetToken}`;
 
   const message = `
       <h1>This message is from Prescripto Project</h1>
@@ -410,6 +410,8 @@ const changeAdminPassword = asyncHandler(async function (req, res) {
     .status(200)
     .json(new ApiResponse(200, "Password Changed Successfully", newAdmin));
 });
+
+// api to get all the doctor for admin panel
 
 module.exports = {
   addDoctor,

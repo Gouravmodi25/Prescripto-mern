@@ -48,8 +48,9 @@ const doctorSchema = new mongoose.Schema(
       trim: true,
     },
     availability: {
-      type: Boolean,
-      default: true,
+      type: String,
+      enum: ["Available", "Unavailable", "On Leave"], // Allowed values
+      default: "Available", // Default value
     },
     fees: {
       type: Number,

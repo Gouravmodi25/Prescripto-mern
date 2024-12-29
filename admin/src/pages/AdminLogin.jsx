@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
 
 const AdminLogin = () => {
-  const [state, setState] = useState("Sign up");
+  const [state, setState] = useState("Login");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -83,7 +83,7 @@ const AdminLogin = () => {
       className="min-h-[80vh] flex items-center">
       <div className="flex flex-col gap-3 m-auto border  items-start p-8 min-w-[340px] sm:min-w-96 rounded-xl text-zinc-600 text-sm shadow-lg">
         <p className="text-2xl font-semibold m-auto">
-          <span className="text-primary">Admin</span>
+          <span className="text-primary">Admin  </span>
           {state == "Sign up" ? "Create account" : "Login"}{" "}
         </p>
 
