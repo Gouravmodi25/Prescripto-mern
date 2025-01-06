@@ -8,6 +8,7 @@ const {
   changeAdminPassword,
   forgotPassword,
   resetPassword,
+  getAllDoctor,
 } = require("../controller/admin.controller.js");
 const adminAuthentication = require("../middlewares/adminAuth.middleware.js");
 
@@ -35,5 +36,8 @@ adminRouter
 adminRouter.route("/admin-forgotPassword").post(forgotPassword);
 
 adminRouter.route("/resetPassword/:resetToken").post(resetPassword);
+
+// retrieve all doctor
+adminRouter.route("/all-doctors").post(adminAuthentication, getAllDoctor);
 
 module.exports = adminRouter;

@@ -11,28 +11,39 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const logout = async () => {
-    navigate("/");
-    const data = await axios.post(
-      `${backendUrl}/api/admin/admin-loggedOut`,
-      {},
-      {
-        headers: {
-          Authorization: `${cookie}`, // Include token in headers
-        },
-        withCredentials: false,
+    try {
+      // Call the logout API
+      const response = await axios.post(
+        `${backendUrl}/api/admin/admin-loggedOut`,
+        {},
+        {
+          headers: {
+            Authorization: `${cookie}`, // Include token in headers
+          },
+          withCredentials: false,
+        }
+      );
+
+      // Handle API response
+      if (response.data.success) {
+        toast.success(response.data.message || "Logged out successfully!");
+      } else {
+        toast.warn("Logout API responded but did not succeed.");
       }
-    );
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to log out. Please try again.");
+    } finally {
+      // Clear local storage and cookies
+      Cookies.remove("accessToken");
+      localStorage.removeItem("access-token");
 
-    Cookies.remove("accessToken");
+      // Clear context state
+      setCookie("");
 
-    console.log(data);
-
-    if (data.data.success) {
-      toast.success(data.data.message);
+      // Redirect to login page
+      navigate("/");
     }
-
-    cookie && setCookie("");
-    cookie && localStorage.removeItem("access-token");
   };
 
   return (

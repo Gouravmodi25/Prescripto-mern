@@ -375,7 +375,7 @@ const logoutAdmin = asyncHandler(async function (req, res) {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200, "User Logged out", admin));
+    .json(new ApiResponse(200, "Admin Logged out", admin));
 });
 
 const changeAdminPassword = asyncHandler(async function (req, res) {
@@ -413,6 +413,27 @@ const changeAdminPassword = asyncHandler(async function (req, res) {
 
 // api to get all the doctor for admin panel
 
+const getAllDoctor = asyncHandler(async (req, res) => {
+  try {
+    const doctor = await DoctorModel.find({}).select("-password");
+
+    if (doctor.length === 0) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, "No Doctors Please Add Doctor"));
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Successfully Get All Doctor", doctor));
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Error While Retrieving Doctor "));
+  }
+});
+
 module.exports = {
   addDoctor,
   registerAdminAccount,
@@ -421,4 +442,5 @@ module.exports = {
   changeAdminPassword,
   forgotPassword,
   resetPassword,
+  getAllDoctor,
 };
