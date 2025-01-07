@@ -7,7 +7,7 @@ import AppContextProvider from "./context/AppContext.jsx";
 import { StrictMode } from "react";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  <>
     <AdminContextProvider>
       <DoctorContextProvider>
         <AppContextProvider>
@@ -15,5 +15,5 @@ createRoot(document.getElementById("root")).render(
         </AppContextProvider>
       </DoctorContextProvider>
     </AdminContextProvider>
-  </StrictMode>
+  </>
 );

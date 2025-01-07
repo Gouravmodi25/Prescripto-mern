@@ -31,7 +31,7 @@ const Navbar = () => {
         toast.warn("Logout API responded but did not succeed.");
       }
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Logout error:", error.response.data.message);
       toast.error("Failed to log out. Please try again.");
     } finally {
       // Clear local storage and cookies

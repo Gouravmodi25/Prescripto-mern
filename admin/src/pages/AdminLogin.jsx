@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AdminContext } from "../context/AdminContext";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -11,7 +11,7 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const { setCookie, backendUrl } = useContext(AdminContext);
+  const { cookie, setCookie, backendUrl } = useContext(AdminContext);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -77,13 +77,17 @@ const AdminLogin = () => {
     setShowPassword((prev) => !prev);
   };
 
+  useEffect(() => {
+    console.log(cookie);
+  }, [cookie]);
+
   return (
     <form
       onSubmit={(event) => onSubmitHandler(event)}
       className="min-h-[80vh] flex items-center">
       <div className="flex flex-col gap-3 m-auto border  items-start p-8 min-w-[340px] sm:min-w-96 rounded-xl text-zinc-600 text-sm shadow-lg">
         <p className="text-2xl font-semibold m-auto">
-          <span className="text-primary">Admin  </span>
+          <span className="text-primary">Admin </span>
           {state == "Sign up" ? "Create account" : "Login"}{" "}
         </p>
 
