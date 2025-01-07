@@ -11,6 +11,7 @@ const {
   getAllDoctor,
 } = require("../controller/admin.controller.js");
 const adminAuthentication = require("../middlewares/adminAuth.middleware.js");
+const { changeAvailability } = require("../controller/doctor.controller.js");
 
 // admin router
 
@@ -39,5 +40,11 @@ adminRouter.route("/resetPassword/:resetToken").post(resetPassword);
 
 // retrieve all doctor
 adminRouter.route("/all-doctors").post(adminAuthentication, getAllDoctor);
+
+// change availability
+
+adminRouter
+  .route("/change-availability")
+  .patch(adminAuthentication, changeAvailability);
 
 module.exports = adminRouter;

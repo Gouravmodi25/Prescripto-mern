@@ -1,8 +1,32 @@
 import { useContext, useEffect } from "react";
 import { AdminContext } from "../../context/AdminContext";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const DoctorList = () => {
-  const { doctors, cookie, getAllDoctor } = useContext(AdminContext);
+  const { doctors, cookie, getAllDoctor, backendUrl } =
+    useContext(AdminContext);
+
+  const handleChangeAvailability = async function (doctorId, status) {
+    try {
+      const data = await axios.patch(
+        `${backendUrl}/api/admin/change-availability`,
+        { doctorId: String(doctorId), status: String(status) },
+        {
+          headers: {
+            Authorization: cookie,
+          },
+        }
+      );
+
+      if (data.data.success) {
+        toast.success(data.data.message);
+        getAllDoctor();
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
 
   useEffect(() => {
     console.log(cookie);
@@ -47,15 +71,16 @@ const DoctorList = () => {
                   }
                   className=""
                 />
-                <p
-                  className={`${
-                    item.availability === "Unavailable" ||
-                    item.availability === "On Leave"
-                      ? "text-red-500"
-                      : "text-green-500"
-                  } font-medium`}>
-                  {item.availability}
-                </p>
+                <select
+                  id="availability"
+                  onChange={(event) => {
+                    handleChangeAvailability(item._id, event.target.value);
+                  }}
+                  value={item.availability}>
+                  <option value="Available">Available</option>
+                  <option value="Unavailable">Unavailable</option>
+                  <option value="On Leave">On Leave</option>
+                </select>
               </div>
             </div>
           </div>
