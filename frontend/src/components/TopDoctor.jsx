@@ -1,10 +1,14 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 
 const TopDoctor = () => {
   const navigate = useNavigate();
-  const { doctors } = useContext(AppContext);
+  const { doctors, getAllDoctor } = useContext(AppContext);
+
+  useEffect(() => {
+    getAllDoctor();
+  }, []);
   return (
     <div className="flex flex-col items-center gap-4 my-16 text-gray-900 md:mx-10 ">
       <h1 className="text-3xl font-medium">Top Doctors</h1>
@@ -21,14 +25,34 @@ const TopDoctor = () => {
               }}
               className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-200"
               key={item._id}>
-              <img className="bg-blue-50" src={item.image} alt="doc_image" />
+              <img
+                className="bg-blue-50"
+                src={item.profile_image}
+                alt="doc_image"
+              />
               <div className="p-4">
-                <div className="flex gap-2 text-green-500 items-center text-sm text-center">
-                  <p className="w-2 h-2 rounded-full bg-green-500"></p>
-                  <p>Available</p>
+                <div
+                  className={`flex gap-2  ${
+                    item.availability == "Unavailable" ||
+                    item.availability == "On Leave"
+                      ? "text-red-500"
+                      : "text-green-500"
+                  }  items-center text-sm text-center`}>
+                  <p
+                    className={`w-2 h-2 rounded-full ${
+                      item.availability == "Unavailable" ||
+                      item.availability == "On Leave"
+                        ? "bg-red-500"
+                        : " bg-green-500"
+                    } bg-green-500`}></p>
+                  <p>{item.availability}</p>
                 </div>
-                <p className="text-gray-900 text-lg font-medium">{item.name}</p>
-                <p className="text-sm text-gray-600">{item.speciality}</p>
+                <p className="text-gray-900 text-lg font-medium">
+                  {item.fullName.toUpperCase()}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {item.speciality.toUpperCase()}
+                </p>
               </div>
             </div>
           );

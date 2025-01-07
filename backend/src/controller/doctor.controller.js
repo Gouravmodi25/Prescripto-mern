@@ -44,6 +44,23 @@ const changeAvailability = asyncHandler(async function (req, res) {
     );
 });
 
+// to get all doctors
+
+const getAllDoctors = asyncHandler(async function (req, res) {
+  try {
+    const doctor = await DoctorModel.find({}).select(["-password", "-email"]);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Successfully Get All Doctor", doctor));
+  } catch (error) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Error While Retrieving Doctor"));
+  }
+});
+
 module.exports = {
   changeAvailability,
+  getAllDoctors,
 };

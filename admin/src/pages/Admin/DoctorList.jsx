@@ -24,7 +24,7 @@ const DoctorList = () => {
         getAllDoctor();
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response.data.message);
     }
   };
 
@@ -45,7 +45,7 @@ const DoctorList = () => {
       <div className="w-full flex flex-wrap gap-4 pt-5 gap-y-6">
         {doctors.map((item, index) => (
           <div
-            className=" transition-all duration-500 border border-indigo-200 rounded-xl max-w-56 overflow-hidden cursor-pointer group"
+            className="hover:translate-y-[-10px] transition-all   duration-200 border border-indigo-200 rounded-xl max-w-56 overflow-hidden cursor-pointer group"
             key={index}>
             <img
               className="bg-indigo-100 group-hover:bg-primary transition-all duration-500 "

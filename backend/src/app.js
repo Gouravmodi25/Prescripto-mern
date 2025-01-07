@@ -4,6 +4,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 // admin router
 const adminRouter = require("../src/routes/admin.routes.js");
+const doctorRouter = require("../src/routes/doctor.routes.js");
 
 const app = express();
 
@@ -35,5 +36,7 @@ app.use(cookieParser());
 
 // admin api endpoint
 app.use("/api/admin", adminRouter);
+
+app.use("/api/doctor", doctorRouter);
 
 module.exports = app;

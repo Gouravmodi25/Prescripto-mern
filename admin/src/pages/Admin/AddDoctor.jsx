@@ -46,7 +46,7 @@ const AddDoctor = () => {
       setAddress1("");
       setAddress2("");
       setAbout("");
-      setAvailability("False");
+      setAvailability("Available");
     };
 
     const formData = new FormData();

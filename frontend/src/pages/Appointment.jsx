@@ -7,7 +7,7 @@ import RelatedDoctor from "../components/RelatedDoctor.jsx";
 const Appointment = () => {
   const { doctorId } = useParams();
   const [docInfo, setDocInfo] = useState(null);
-  const { doctors, currencySymbol } = useContext(AppContext);
+  const { doctors, getAllDoctor, currencySymbol } = useContext(AppContext);
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
   const [docSlots, setDocSlots] = useState([]);
@@ -73,6 +73,7 @@ const Appointment = () => {
 
   useEffect(() => {
     getAvailbleSlots();
+    getAllDoctor();
   }, [docInfo]);
 
   useEffect(() => {
@@ -89,7 +90,7 @@ const Appointment = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <div>
             <img
-              src={docInfo.image}
+              src={docInfo.profile_image}
               alt="doctor-image"
               className="w-full sm:max-w-72 rounded-lg bg-primary"
             />
@@ -97,7 +98,7 @@ const Appointment = () => {
           <div className="  flex-1 border border-gray-400 bg-white p-8 py-7 mx-2 sm:mx-0 mt-[-80px] sm:mt-0 ">
             {/* {doc-name,degree,experience} */}
             <p className="flex items-center text-2xl text-gray-900 gap-2 font-medium">
-              {docInfo.name}{" "}
+              {docInfo.fullName.toUpperCase()}{" "}
               <img
                 className="w-5"
                 src={assets.verified_icon}
@@ -106,7 +107,7 @@ const Appointment = () => {
             </p>
             <div className="flex items-center mt-1 gap-2 text-sm text-gray-600">
               <p>
-                {docInfo.degree} - {docInfo.speciality}
+                {docInfo.degree} - {docInfo.speciality.toUpperCase()}
               </p>
               <button className="py-.5 rounded-full px-2 border text-sm shadow-md">
                 {docInfo.experience}

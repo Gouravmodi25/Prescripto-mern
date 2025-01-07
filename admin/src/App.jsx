@@ -12,6 +12,7 @@ import Dashboard from "./pages/Admin/Dashboard";
 import AllAppointment from "./pages/Admin/AllAppointment";
 import AddDoctor from "./pages/Admin/AddDoctor";
 import DoctorList from "./pages/Admin/DoctorList";
+import ChangePassword from "./pages/Admin/ChangePassword";
 
 const AppLayout = ({ children }) => (
   <div className=" bg-[#f8f9fd]">
@@ -42,6 +43,7 @@ const App = () => {
                   <Route path="/all-appointment" element={<AllAppointment />} />
                   <Route path="/add-doctor" element={<AddDoctor />} />
                   <Route path="/doctor-list" element={<DoctorList />} />
+                  <Route path="/change-password" element={<ChangePassword />} />
                 </Routes>
               </AppLayout>
             }

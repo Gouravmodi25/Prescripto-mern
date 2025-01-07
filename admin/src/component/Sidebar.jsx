@@ -50,6 +50,16 @@ const Sidebar = () => {
             <img src={assets.people_icon} alt="doctor_list" />
             <p>Doctors List</p>
           </NavLink>
+          <NavLink
+            className={({ isActive }) =>
+              `flex items-start gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
+                isActive ? "bg-[#f2f3ff] border-r-4 border-primary " : ""
+              }`
+            }
+            to={"/change-password"}>
+            <img src={assets.people_icon} alt="doctor_list" />
+            <p>Change Password</p>
+          </NavLink>
         </ul>
       )}
     </div>
