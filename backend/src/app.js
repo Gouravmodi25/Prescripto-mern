@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 // admin router
 const adminRouter = require("../src/routes/admin.routes.js");
 const doctorRouter = require("../src/routes/doctor.routes.js");
+const userRouter = require("../src//routes/user.routes.js");
 
 const app = express();
 
@@ -38,5 +39,7 @@ app.use(cookieParser());
 app.use("/api/admin", adminRouter);
 
 app.use("/api/doctor", doctorRouter);
+
+app.use("/api/user", userRouter);
 
 module.exports = app;

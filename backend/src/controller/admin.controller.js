@@ -132,8 +132,8 @@ const addDoctor = asyncHandler(async (req, res) => {
   }
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, "Doctor added successfully", createDoctor));
+    .status(201)
+    .json(new ApiResponse(201, "Doctor added successfully", createDoctor));
 });
 
 // register admin endpoint
@@ -194,9 +194,9 @@ const registerAdminAccount = asyncHandler(async (req, res, next) => {
   }
 
   return res
-    .status(200)
+    .status(201)
     .cookie("accessToken", accessToken, options)
-    .json(new ApiResponse(200, "Admin Register successfully", createAdmin));
+    .json(new ApiResponse(201, "Admin Register successfully", createAdmin));
 });
 
 // login admin endpoint
