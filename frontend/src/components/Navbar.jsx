@@ -1,11 +1,21 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets.js";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AppContext } from "../context/AppContext.jsx";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
-  const [token, setToken] = useState(true);
+  const context = useContext(AppContext);
+
+  if (!context) {
+    throw new Error(
+      "AppContext is undefined. Ensure AppContextProvider is wrapping the component tree."
+    );
+  }
+
+  const { cookie } = context;
+
   return (
     <div className="flex items-center justify-between py-5 mb-5 text-sm border-b border-b-gray-500">
       <img
@@ -33,7 +43,7 @@ const Navbar = () => {
         </NavLink>
       </ul>
       <div className="flex items-center gap-4">
-        {token ? (
+        {cookie ? (
           <div className="flex items-center gap-2 cursor-pointer group relative">
             <img
               className="w-8 rounded-full"
@@ -57,11 +67,7 @@ const Navbar = () => {
                   className="hover:text-black cursor-pointer">
                   MyAppointment
                 </p>
-                <p
-                  onClick={() => setToken(false)}
-                  className="hover:text-black cursor-pointer">
-                  Logout
-                </p>
+                <p className="hover:text-black cursor-pointer">Logout</p>
               </div>
             </div>
           </div>
@@ -111,7 +117,7 @@ const Navbar = () => {
               <p className="px-4 py-2 rounded inline-block">ABOUT</p>
             </NavLink>
             <NavLink onClick={() => setShowMenu(false)} to="/contact">
-              <p className="px-4 py-2 rounded inline-block">ABOUT</p>
+              <p className="px-4 py-2 rounded inline-block">CONTACT US</p>
             </NavLink>
           </ul>
         </div>

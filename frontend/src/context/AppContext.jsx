@@ -1,11 +1,13 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 // import { doctors } from "../assets/assets";
 
-export const AppContext = createContext();
+export const AppContext = createContext(null);
 
 const AppContextProvider = (props) => {
+  const [cookie, setCookie] = useState(Cookies.get("accessToken") || "");
   const [doctors, setDoctors] = useState([]);
   const currencySymbol = "$";
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -28,6 +30,8 @@ const AppContextProvider = (props) => {
     currencySymbol,
     backendUrl,
     getAllDoctor,
+    cookie,
+    setCookie,
   };
 
   return (

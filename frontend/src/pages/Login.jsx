@@ -1,25 +1,100 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import axios from "axios";
+import { AppContext } from "../context/AppContext.jsx";
+import { toast } from "react-toastify";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const { setCookie, cookie, backendUrl } = useContext(AppContext);
+  const navigate = useNavigate();
+
   const [state, setState] = useState("Sign up");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
+
+    // for Sign up
+    try {
+      if (state == "Sign up") {
+        const data = await axios.post(
+          `${backendUrl}/api/user/user-register`,
+          {
+            fullName: String(name),
+            email: String(email),
+            password: String(password),
+          },
+          {
+            withCredentials: true,
+          }
+        );
+
+        const cookie = Cookies.get("accessToken");
+        console.log(cookie);
+        console.log(data);
+
+        if (data.data.success) {
+          localStorage.setItem("access-token", cookie);
+          setCookie(cookie);
+          toast.success(data.data.message);
+          navigate("/");
+          console.log(data.data.data);
+        } else {
+          toast.error(data.data.message);
+        }
+      }
+
+      if (state === "Login") {
+        const data = await axios.post(
+          `${backendUrl}/api/user/user-login`,
+          {
+            email: String(email),
+            password: String(password),
+          },
+          {
+            withCredentials: true, // Ensures the cookie is sent with the request
+          }
+        );
+        const cookie = Cookies.get("accessToken");
+        console.log(cookie);
+        console.log(data);
+        if (data.data.success) {
+          localStorage.setItem("access-token", cookie);
+          setCookie(cookie);
+          toast.success(data.data.message);
+          navigate("/");
+          console.log(data.data.data);
+        } else {
+          toast.error(data.data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
+    }
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
+  useEffect(() => {
+    if (cookie) {
+      navigate("/");
+    }
+  });
+
   return (
     <form
       onSubmit={(e) => onSubmitHandler(e)}
       className="min-h-[80vh] flex items-center">
-      <div className="flex flex-col gap-3 m-auto border  items-start p-8 min-w-[340px] sm:min-w-96 rounded-xl text-zinc-600 text-sm shadow-lg">
+      <div className="flex flex-col gap-3 m-auto border  items-start p-6 min-w-[300px] sm:min-w-[396PX] rounded-2xl text-zinc-600 text-sm shadow-lg">
         <p className="text-2xl font-semibold">
           {state == "Sign up" ? "Create account" : "Login"}
         </p>
@@ -32,7 +107,7 @@ const Login = () => {
             <input
               className="border border-zinc-300 rounded w-full p-2 mt-1"
               type="text"
-              onChange={(e) => setName(e.target.name)}
+              onChange={(event) => setName(event.target.value)}
               value={name}
               placeholder="Enter your name"
               required
@@ -58,7 +133,6 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             value={password}
             placeholder="Enter your password"
-            maxLength="8"
             required
           />
           {password && (
