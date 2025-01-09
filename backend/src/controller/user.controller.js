@@ -132,7 +132,35 @@ const userLogin = asyncHandler(async function (req, res) {
     .json(new ApiResponse(200, "User Logged In Successfully", loggedUser));
 });
 
+// user logout controller
+
+const logoutUser = asyncHandler(async function (req, res) {
+  const { user } = req;
+
+  const loggedInUser = await UserModel.findByIdAndUpdate(
+    user._id,
+    {
+      $unset: {
+        accessToken: 1,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+
+  const options = {
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .json(new ApiResponse(200, "User Logged Out", loggedInUser));
+});
+
 module.exports = {
   registerUser,
   userLogin,
+  logoutUser,
 };

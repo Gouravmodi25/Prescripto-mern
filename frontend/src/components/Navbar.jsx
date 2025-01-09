@@ -2,6 +2,9 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets.js";
 import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext.jsx";
+import axios from "axios";
+import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -14,7 +17,43 @@ const Navbar = () => {
     );
   }
 
-  const { cookie } = context;
+  const { cookie, setCookie, backendUrl } = context;
+
+  const logoutHandler = async () => {
+    try {
+      // Call the logout API
+      const response = await axios.post(
+        `${backendUrl}/api/user/user-logout`,
+        {},
+        {
+          headers: {
+            Authorization: `${cookie}`, // Include token in headers
+          },
+          withCredentials: false,
+        }
+      );
+
+      // Handle API response
+      if (response.data.success) {
+        toast.success(response.data.message || "Logged out successfully!");
+      } else {
+        toast.warn("Logout API responded but did not succeed.");
+      }
+    } catch (error) {
+      console.error("Logout error:", error.response.data.message);
+      toast.error("Failed to log out. Please try again.");
+    } finally {
+      // Clear local storage and cookies
+      Cookies.remove("accessToken");
+      localStorage.removeItem("access-token");
+
+      // Clear context state
+      setCookie("");
+
+      // Redirect to login page
+      navigate("/");
+    }
+  };
 
   return (
     <div className="flex items-center justify-between py-5 mb-5 text-sm border-b border-b-gray-500">
@@ -67,7 +106,11 @@ const Navbar = () => {
                   className="hover:text-black cursor-pointer">
                   MyAppointment
                 </p>
-                <p className="hover:text-black cursor-pointer">Logout</p>
+                <p
+                  onClick={logoutHandler}
+                  className="hover:text-black cursor-pointer">
+                  Logout
+                </p>
               </div>
             </div>
           </div>

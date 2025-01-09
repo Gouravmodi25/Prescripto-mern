@@ -7,7 +7,9 @@ import Cookies from "js-cookie";
 export const AppContext = createContext(null);
 
 const AppContextProvider = (props) => {
-  const [cookie, setCookie] = useState(Cookies.get("accessToken") || "");
+  const [cookie, setCookie] = useState(
+    Cookies.get("accessToken") ? Cookies.get("accessToken") : ""
+  );
   const [doctors, setDoctors] = useState([]);
   const currencySymbol = "$";
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
