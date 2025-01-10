@@ -249,7 +249,7 @@ const userResetPassword = asyncHandler(async (req, res) => {
 
   const resetPasswordToken = crypto
     .createHash("sha256")
-    .update(req.params.resetToken)
+    .update(req.params.resetPasswordToken)
     .digest("hex");
 
   const user = await UserModel.findOne({
@@ -281,4 +281,5 @@ module.exports = {
   userLogin,
   logoutUser,
   userForgotPassword,
+  userResetPassword,
 };

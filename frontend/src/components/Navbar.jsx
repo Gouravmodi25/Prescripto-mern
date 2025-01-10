@@ -59,7 +59,7 @@ const Navbar = () => {
     <div className="flex items-center justify-between py-5 mb-5 text-sm border-b border-b-gray-500">
       <img
         onClick={() => navigate("/")}
-        className="w-44 cursor-pointer"
+        className="w-40 cursor-pointer"
         src={assets.logo}
         alt="logo-image"
       />
@@ -117,7 +117,7 @@ const Navbar = () => {
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="bg-primary px-8 py-3 text-[15px] text-white font-light hidden md:block rounded-full">
+            className="bg-primary px-6 py-3 text-[15px] text-white font-light hidden md:block rounded-full">
             Create Account
           </button>
         )}

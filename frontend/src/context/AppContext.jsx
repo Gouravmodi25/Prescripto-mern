@@ -34,6 +34,8 @@ const AppContextProvider = (props) => {
     getAllDoctor,
     cookie,
     setCookie,
+    resetToken,
+    setResetToken,
   };
 
   return (

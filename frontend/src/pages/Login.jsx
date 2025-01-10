@@ -3,7 +3,7 @@ import axios from "axios";
 import { AppContext } from "../context/AppContext.jsx";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { setCookie, cookie, backendUrl } = useContext(AppContext);
@@ -147,6 +147,14 @@ const Login = () => {
         <button className="bg-primary text-base rounded-lg w-full p-2 text-white outline-none">
           {state == "Sign up" ? "Create Account" : "Login"}
         </button>
+        {state == "Login" && (
+          <p>
+            Forgot Password?{" "}
+            <Link className="cursor-pointer text-primary" to="/forgot-password">
+              Click here
+            </Link>
+          </p>
+        )}
         {state == "Sign up" ? (
           <p>
             Already have an account?{" "}
