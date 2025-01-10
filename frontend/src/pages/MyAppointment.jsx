@@ -15,11 +15,17 @@ const MyAppointment = () => {
               className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b mt-3 pb-3"
               key={item._id}>
               <div>
-                <img className="w-32 bg-indigo-50" src={item.image} alt="" />
+                <img
+                  className="w-32 bg-indigo-50"
+                  src={item.profile_image}
+                  alt=""
+                />
               </div>
               <div className="flex-1 text-sm text-zinc-600">
-                <p className="text-neutral-800 font-semibold">{item.name}</p>
-                <p>{item.speciality}</p>
+                <p className="text-neutral-800 font-semibold">
+                  {item.fullName.toUpperCase()}
+                </p>
+                <p>{item.speciality.toUpperCase()}</p>
                 <p className="text-neutral-700 font-medium mt-1">Address:</p>
                 <p className="text-xs">{item.address.line1}</p>
                 <p className="text-xs">{item.address.line2}</p>

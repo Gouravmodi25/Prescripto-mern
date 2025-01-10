@@ -308,8 +308,8 @@ const resetPassword = asyncHandler(async (req, res) => {
     )
   ) {
     return res
-      .status(200)
-      .json(new ApiResponse(200, "All fields are required"));
+      .status(400)
+      .json(new ApiResponse(400, "All fields are required"));
   }
 
   if (newPassword.length < 8) {

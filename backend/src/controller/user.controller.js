@@ -3,6 +3,8 @@ const UserModel = require("../models/user.models.js");
 const asyncHandler = require("../utils/asyncHandler.js");
 const validator = require("validator");
 const ApiError = require("../utils/ApiError.js");
+const sendEmail = require("../utils/sendMail.js");
+const crypto = require("crypto");
 
 // for generate Token
 const generateToken = async function (userId) {
@@ -159,8 +161,124 @@ const logoutUser = asyncHandler(async function (req, res) {
     .json(new ApiResponse(200, "User Logged Out", loggedInUser));
 });
 
+// user forgot password api
+
+const userForgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (String(email || "").trim() === "") {
+    return res.status(400).json(new ApiResponse(400, "Email is required"));
+  }
+
+  if (!validator.isEmail(email)) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Email is Valid Please Enter valid Email"));
+  }
+
+  const user = await UserModel.findOne({ email });
+
+  if (!user) {
+    return res.status(400).json(new ApiResponse(404, "Invalid Email"));
+  }
+
+  const resetPasswordToken = user.generateResetPasswordToken();
+
+  await user.save({ validateBeforeSave: false });
+
+  const resetPasswordUrl = `http:localhost:5173/reset-password/${resetPasswordToken}`;
+
+  const message = `
+      <h1>This message is from Prescripto Project</h1>
+      <h3>You have requested to reset your password</h3>
+      <p>Please go to this link to reset your password</p>
+      <a href=${resetPasswordUrl} clicktracking=off>${resetPasswordUrl}</a>
+    `;
+
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset Request",
+      text: message,
+    });
+
+    const newUser = await UserModel.findById(user._id).select("-password");
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Email sent successfully", newUser));
+  } catch (error) {
+    admin.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpiry = undefined;
+    await user.save({ validationBeforeSave: false });
+
+    return res
+      .status(500)
+      .json(new ApiResponse(500, "Email could not be sent"));
+  }
+});
+
+// user reset Password api
+
+const userResetPassword = asyncHandler(async (req, res) => {
+  const { newPassword, confirmPassword } = req.body;
+
+  if (
+    [newPassword, confirmPassword].some(
+      (field) => String(field || "").trim() === ""
+    )
+  ) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "All fields are Required"));
+  }
+
+  if (newPassword.length < 8) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(400, "Password must be at least 8 characters long")
+      );
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Both Password should be same"));
+  }
+
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.resetToken)
+    .digest("hex");
+
+  const user = await UserModel.findOne({
+    resetPasswordToken,
+    resetPasswordTokenExpiry: { $gt: Date.now() },
+  });
+
+  console.log(resetPasswordToken);
+
+  if (!user) {
+    return res.status(400).json(new ApiResponse(400, "Invalid Reset Token"));
+  }
+
+  user.password = newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordTokenExpiry = undefined;
+
+  await user.save({ validateBeforeSave: false });
+
+  const newUser = await UserModel.findById(user._id).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Password Reset Successfully", newUser));
+});
+
 module.exports = {
   registerUser,
   userLogin,
   logoutUser,
+  userForgotPassword,
 };

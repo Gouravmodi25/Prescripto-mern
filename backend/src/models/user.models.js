@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema({
   fullName: {
@@ -83,6 +84,18 @@ userSchema.methods.generateAccessToken = function () {
       expiresIn: "1d",
     }
   );
+};
+
+userSchema.methods.generateResetPasswordToken = function () {
+  const resetToken = crypto.randomBytes(20).toString("hex");
+
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.resetPasswordTokenExpiry = Date.now() + 10 * (60 * 1000);
+  return resetToken;
 };
 
 const UserModel = mongoose.model("Users", userSchema);
