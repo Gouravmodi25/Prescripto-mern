@@ -276,10 +276,46 @@ const userResetPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Password Reset Successfully", newUser));
 });
 
+// user change password api
+
+const userChangePassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  const user = await UserModel.findById(req.user._id);
+
+  const isUserCorrectPassword = await user.isCorrectPassword(oldPassword);
+
+  if (!isUserCorrectPassword) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Old Password is incorrect"));
+  }
+
+  const isSamePassword = await user.isSamePassword(newPassword);
+
+  if (isSamePassword) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(400, "New Password should not same as old Password")
+      );
+  }
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  const newUser = await UserModel.findById(user._id).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Password Changed Successfully", newUser));
+});
+
 module.exports = {
   registerUser,
   userLogin,
   logoutUser,
   userForgotPassword,
   userResetPassword,
+  userChangePassword,
 };

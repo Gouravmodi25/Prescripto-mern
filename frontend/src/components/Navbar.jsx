@@ -107,6 +107,11 @@ const Navbar = () => {
                   MyAppointment
                 </p>
                 <p
+                  onClick={() => navigate("change-password")}
+                  className="hover:text-black cursor-pointer">
+                  Change Password
+                </p>
+                <p
                   onClick={logoutHandler}
                   className="hover:text-black cursor-pointer">
                   Logout
@@ -169,12 +174,12 @@ const Navbar = () => {
                   logoutHandler();
                 }}>
                 <p className="px-4 py-2 rounded inline-block cursor-pointer">
-                  Logout
+                  LOGOUT
                 </p>
               </div>
             ) : (
               <NavLink onClick={() => setShowMenu(false)} to="/login">
-                <p className="px-4 py-2 rounded inline-block ">Login</p>
+                <p className="px-4 py-2 rounded inline-block ">LOGIN</p>
               </NavLink>
             )}
           </ul>

@@ -13,6 +13,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import ChangePassword from "./pages/ChangePassword.jsx";
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
+        <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/my-profile" element={<MyProfile />} />
         <Route path="/my-appointment" element={<MyAppointment />} />
         <Route path="/appointment/:doctorId" element={<Appointment />} />

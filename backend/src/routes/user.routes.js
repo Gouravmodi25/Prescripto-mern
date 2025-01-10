@@ -8,6 +8,7 @@ const {
   logoutUser,
   userForgotPassword,
   userResetPassword,
+  userChangePassword,
 } = require("../controller/user.controller.js");
 
 // register user route
@@ -29,5 +30,11 @@ userRouter.route("/user-forgot-password").post(userForgotPassword);
 userRouter
   .route("/user-reset-password/:resetPasswordToken")
   .patch(userResetPassword);
+
+//user change password route
+
+userRouter
+  .route("/user-change-password")
+  .patch(userAuthentication, userChangePassword);
 
 module.exports = userRouter;
