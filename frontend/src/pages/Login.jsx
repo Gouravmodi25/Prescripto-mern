@@ -9,7 +9,7 @@ const Login = () => {
   const { setCookie, cookie, backendUrl } = useContext(AppContext);
   const navigate = useNavigate();
 
-  const [state, setState] = useState("Sign up");
+  const [state, setState] = useState("Login");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

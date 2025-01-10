@@ -11,6 +11,10 @@
   @apply block;
 }
 
+.active a {
+  @apply bg-primary text-white rounded-lg;
+}
+
 ::-webkit-scrollbar {
   @apply hidden;
 }

@@ -12,10 +12,12 @@ const ForgotPassword = () => {
     event.preventDefault();
 
     try {
-      const data = await axios.patch(
+      const data = await axios.post(
         `${backendUrl}/api/user/user-forgot-password`,
         { email: String(email) }
       );
+
+      console.log(data);
 
       if (data.data.success) {
         toast.success(data.data.message);

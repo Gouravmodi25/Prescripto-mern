@@ -118,7 +118,7 @@ const Navbar = () => {
           <button
             onClick={() => navigate("/login")}
             className="bg-primary px-6 py-3 text-[15px] text-white font-light hidden md:block rounded-full">
-            Create Account
+            Login
           </button>
         )}
         <img
@@ -154,7 +154,7 @@ const Navbar = () => {
               <p className="px-4 py-2 rounded inline-block">HOME</p>
             </NavLink>
             <NavLink onClick={() => setShowMenu(false)} to="/doctors">
-              <p className="px-4 py-2 rounded inline-block">ALL DOCTORS</p>
+              <p className={` px-4 py-2 rounded inline-block `}>ALL DOCTORS</p>
             </NavLink>
             <NavLink onClick={() => setShowMenu(false)} to="/about">
               <p className="px-4 py-2 rounded inline-block">ABOUT</p>
@@ -162,6 +162,21 @@ const Navbar = () => {
             <NavLink onClick={() => setShowMenu(false)} to="/contact">
               <p className="px-4 py-2 rounded inline-block">CONTACT US</p>
             </NavLink>
+            {cookie ? (
+              <div
+                onClick={() => {
+                  setShowMenu(false);
+                  logoutHandler();
+                }}>
+                <p className="px-4 py-2 rounded inline-block cursor-pointer">
+                  Logout
+                </p>
+              </div>
+            ) : (
+              <NavLink onClick={() => setShowMenu(false)} to="/login">
+                <p className="px-4 py-2 rounded inline-block ">Login</p>
+              </NavLink>
+            )}
           </ul>
         </div>
       </div>
