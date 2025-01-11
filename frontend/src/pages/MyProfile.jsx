@@ -189,7 +189,13 @@ const MyProfile = () => {
                 className="max-w-28 bg-gray-100"
                 type="date"
                 value={date_of_birth}
-                onChange={(e) => setDate_of_birth(e.target.value)}
+                onChange={(e) => {
+                  setDate_of_birth(e.target.value);
+                  setUserData((prev) => ({
+                    ...prev,
+                    date_of_birth: e.target.value,
+                  }));
+                }}
               />
             ) : (
               <p className="text-gray-400">{userData.date_of_birth}</p>
