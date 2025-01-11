@@ -5,6 +5,7 @@ const validator = require("validator");
 const ApiError = require("../utils/ApiError.js");
 const sendEmail = require("../utils/sendMail.js");
 const crypto = require("crypto");
+const uploadOnCLoudinary = require("../utils/uploadOnCLoudinary.js");
 
 // for generate Token
 const generateToken = async function (userId) {
@@ -311,6 +312,60 @@ const userChangePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Password Changed Successfully", newUser));
 });
 
+const updateUserDetails = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+
+  const { fullName, address, gender, date_of_birth, phone } = req.body;
+
+  if (
+    [fullName, address, gender, date_of_birth, phone].some(
+      (item) => String(item || "").trim() === ""
+    )
+  ) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "All Fields are required"));
+  }
+
+  const profile_imageLocalPath = req.file?.path;
+
+  console.log("profile_imageLocalPath", profile_imageLocalPath);
+
+  if (!profile_imageLocalPath) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Profile Image is required"));
+  }
+
+  const profile_image = await uploadOnCLoudinary(profile_imageLocalPath);
+
+  if (!profile_image) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Error While uploading image on CLoudinary"));
+  }
+
+  const newUser = await UserModel.findByIdAndUpdate(userId, {
+    fullName,
+    address: JSON.parse(address),
+    phone,
+    gender,
+    profile_image: profile_image.url,
+  });
+
+  const user = await UserModel.findById(newUser._id).select("-password");
+
+  if (!user) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Error While Updating Profile"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Profile Updated SuccessFully"));
+});
+
 module.exports = {
   registerUser,
   userLogin,
@@ -318,4 +373,5 @@ module.exports = {
   userForgotPassword,
   userResetPassword,
   userChangePassword,
+  updateUserDetails,
 };

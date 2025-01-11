@@ -9,7 +9,9 @@ const {
   userForgotPassword,
   userResetPassword,
   userChangePassword,
+  updateUserDetails,
 } = require("../controller/user.controller.js");
+const upload = require("../middlewares/multer.middleware.js");
 
 // register user route
 userRouter.route("/user-register").post(registerUser);
@@ -36,5 +38,11 @@ userRouter
 userRouter
   .route("/user-change-password")
   .patch(userAuthentication, userChangePassword);
+
+// update user details route
+
+userRouter
+  .route("/user-update-details")
+  .patch(upload.single("profile_image"), userAuthentication, updateUserDetails);
 
 module.exports = userRouter;
