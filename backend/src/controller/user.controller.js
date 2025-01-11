@@ -312,8 +312,12 @@ const userChangePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Password Changed Successfully", newUser));
 });
 
+// update user details
+
 const updateUserDetails = asyncHandler(async (req, res) => {
-  const { userId } = req.user;
+  const userId = req.user._id;
+
+  console.log(userId);
 
   const { fullName, address, gender, date_of_birth, phone } = req.body;
 
@@ -325,6 +329,20 @@ const updateUserDetails = asyncHandler(async (req, res) => {
     return res
       .status(400)
       .json(new ApiResponse(400, "All Fields are required"));
+  }
+
+  if (!["Male", "Female", "Not selected"].includes(gender)) {
+    return res.status(400).json(new ApiResponse(400, "Invalid Gender Value"));
+  }
+
+  if (
+    !validator.isDate(date_of_birth, { format: "YYYY-MM-DD", strictMode: true })
+  ) {
+    return res.status(400).json(new ApiResponse(400, "Invalid Date "));
+  }
+
+  if (!validator.isMobilePhone(phone, "en-IN", { strictMode: true })) {
+    return res.status(200).json(new ApiResponse(400, "Invalid Phone Number"));
   }
 
   const profile_imageLocalPath = req.file?.path;
@@ -345,13 +363,20 @@ const updateUserDetails = asyncHandler(async (req, res) => {
       .json(new ApiResponse(400, "Error While uploading image on CLoudinary"));
   }
 
-  const newUser = await UserModel.findByIdAndUpdate(userId, {
-    fullName,
-    address: JSON.parse(address),
-    phone,
-    gender,
-    profile_image: profile_image.url,
-  });
+  const newUser = await UserModel.findByIdAndUpdate(
+    userId,
+    {
+      fullName,
+      address: JSON.parse(address),
+      phone,
+      gender,
+      date_of_birth,
+      profile_image: profile_image.url,
+    },
+    {
+      new: true,
+    }
+  );
 
   const user = await UserModel.findById(newUser._id).select("-password");
 
@@ -363,7 +388,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "Profile Updated SuccessFully"));
+    .json(new ApiResponse(200, "Profile Updated SuccessFully", user));
 });
 
 module.exports = {
