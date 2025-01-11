@@ -316,54 +316,68 @@ const userChangePassword = asyncHandler(async (req, res) => {
 
 const updateUserDetails = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-
-  console.log(userId);
-
   const { fullName, address, gender, date_of_birth, phone } = req.body;
 
-  if (
-    [fullName, address, gender, date_of_birth, phone].some(
-      (item) => String(item || "").trim() === ""
-    )
-  ) {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, "All Fields are required"));
-  }
+  // Validate input using a single object for better readability
+  const validationErrors = [];
 
+  if (!fullName) validationErrors.push("FullName is required");
+  if (!address) validationErrors.push("Address is required");
+  if (!gender) validationErrors.push("Gender is required");
+  if (!date_of_birth) validationErrors.push("Date of Birth is required");
+  if (!phone) validationErrors.push("Phone is required");
   if (!["Male", "Female", "Not selected"].includes(gender)) {
-    return res.status(400).json(new ApiResponse(400, "Invalid Gender Value"));
+    validationErrors.push("Invalid gender");
   }
-
   if (
     !validator.isDate(date_of_birth, { format: "YYYY-MM-DD", strictMode: true })
   ) {
-    return res.status(400).json(new ApiResponse(400, "Invalid Date "));
+    validationErrors.push("Invalid Date of Birth");
   }
-
   if (!validator.isMobilePhone(phone, "en-IN", { strictMode: true })) {
-    return res.status(200).json(new ApiResponse(400, "Invalid Phone Number"));
+    validationErrors.push("Invalid Phone number");
   }
 
-  const profile_imageLocalPath = req.file?.path;
+  if (validationErrors.length > 0) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, validationErrors.join(", ")));
+  }
 
-  console.log("profile_imageLocalPath", profile_imageLocalPath);
+  const existingUser = await UserModel.findById(userId);
+  if (!existingUser) {
+    return res.status(400).json(new ApiResponse(400, "User not found"));
+  }
 
-  if (!profile_imageLocalPath) {
+  // Handle profile image logic more concisely
+  let profileImageUrl = existingUser.profile_image;
+  let profileImageLocalPath = req?.file?.path;
+
+  if (profileImageLocalPath) {
+    try {
+      const cloudinaryResponse = await uploadOnCLoudinary(
+        profileImageLocalPath
+      );
+      if (cloudinaryResponse) {
+        profileImageUrl = cloudinaryResponse.url;
+      } else {
+        return res
+          .status(400)
+          .json(
+            new ApiResponse(400, "Error While uploading image to Cloudinary")
+          );
+      }
+    } catch (error) {
+      return res.status(400).json(new ApiResponse(400, error.message));
+    }
+  } else if (!profileImageUrl) {
     return res
       .status(400)
       .json(new ApiResponse(400, "Profile Image is required"));
   }
 
-  const profile_image = await uploadOnCLoudinary(profile_imageLocalPath);
-
-  if (!profile_image) {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, "Error While uploading image on CLoudinary"));
-  }
-
-  const newUser = await UserModel.findByIdAndUpdate(
+  // Update user details in a single operation
+  const updatedUser = await UserModel.findByIdAndUpdate(
     userId,
     {
       fullName,
@@ -371,16 +385,12 @@ const updateUserDetails = asyncHandler(async (req, res) => {
       phone,
       gender,
       date_of_birth,
-      profile_image: profile_image.url,
+      profile_image: profileImageUrl,
     },
-    {
-      new: true,
-    }
-  );
+    { new: true, runValidators: true } // Ensure validation rules are applied during update
+  ).select("-password");
 
-  const user = await UserModel.findById(newUser._id).select("-password");
-
-  if (!user) {
+  if (!updatedUser) {
     return res
       .status(400)
       .json(new ApiResponse(400, "Error While Updating Profile"));
@@ -388,7 +398,27 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "Profile Updated SuccessFully", user));
+    .json(new ApiResponse(200, "Profile Updated Successfully", updatedUser));
+});
+// get logged user details
+
+const getLoggedUserDetails = asyncHandler(async function (req, res) {
+  const userId = req.user._id;
+
+  const user = await UserModel.findById(userId).select([
+    "-password",
+    "-accessToken",
+  ]);
+
+  if (!user) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Error While Finding User"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "SuccessFully Fetched User Details", user));
 });
 
 module.exports = {
@@ -399,4 +429,5 @@ module.exports = {
   userResetPassword,
   userChangePassword,
   updateUserDetails,
+  getLoggedUserDetails,
 };

@@ -6,8 +6,7 @@ import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const { setCookie, cookie, backendUrl, userData, setUserData } =
-    useContext(AppContext);
+  const { setCookie, cookie, backendUrl } = useContext(AppContext);
   const navigate = useNavigate();
   const [state, setState] = useState("Login");
   const [showPassword, setShowPassword] = useState(false);
@@ -41,7 +40,6 @@ const Login = () => {
           localStorage.setItem("access-token", cookie);
           setCookie(cookie);
           toast.success(data.data.message);
-          setUserData(data.data.data);
           navigate("/");
         } else {
           toast.error(data.data.message);
@@ -66,7 +64,6 @@ const Login = () => {
           localStorage.setItem("access-token", cookie);
           setCookie(cookie);
           toast.success(data.data.message);
-          setUserData(data.data.data);
           navigate("/");
         } else {
           toast.error(data.data.message);

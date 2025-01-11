@@ -17,7 +17,7 @@ const Navbar = () => {
     );
   }
 
-  const { cookie, setCookie, backendUrl } = context;
+  const { cookie, setCookie, backendUrl, userData } = context;
 
   const logoutHandler = async () => {
     try {
@@ -82,11 +82,11 @@ const Navbar = () => {
         </NavLink>
       </ul>
       <div className="flex items-center gap-4">
-        {cookie ? (
+        {cookie && userData ? (
           <div className="flex items-center gap-2 cursor-pointer group relative">
             <img
               className="w-8 rounded-full"
-              src={assets.profile_pic}
+              src={userData.profile_image}
               alt="profile_pic"
             />
             <img

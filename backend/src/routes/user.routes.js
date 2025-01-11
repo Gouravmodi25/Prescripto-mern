@@ -10,6 +10,7 @@ const {
   userResetPassword,
   userChangePassword,
   updateUserDetails,
+  getLoggedUserDetails,
 } = require("../controller/user.controller.js");
 const upload = require("../middlewares/multer.middleware.js");
 
@@ -44,5 +45,9 @@ userRouter
 userRouter
   .route("/user-update-details")
   .patch(upload.single("profile_image"), userAuthentication, updateUserDetails);
+
+// fetched User Details
+
+userRouter.route("/get-details").get(userAuthentication, getLoggedUserDetails);
 
 module.exports = userRouter;

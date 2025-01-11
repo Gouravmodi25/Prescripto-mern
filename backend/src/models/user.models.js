@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     default: "1234567890",
-    maxlength: 10,
+    maxlength: 13,
   },
   accessToken: {
     type: String,
