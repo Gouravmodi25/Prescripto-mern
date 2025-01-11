@@ -18,32 +18,32 @@ const appointmentSchema = new mongoose.Schema({
     required: true,
   },
   userData: {
-    type: String,
+    type: Object,
     required: true,
   },
   doctorData: {
-    type: String,
+    type: Object,
     required: true,
   },
   amount: {
-    type: String,
+    type: Number,
     required: true,
   },
   date: {
-    type: String,
+    type: Number,
     required: true,
   },
   cancelled: {
-    type: String,
-    required: true,
+    type: Boolean,
+    default: false,
   },
   payment: {
-    type: String,
-    required: true,
+    type: Boolean,
+    default: false,
   },
   isComplete: {
-    type: String,
-    required: true,
+    type: Boolean,
+    default: false,
   },
 });
 

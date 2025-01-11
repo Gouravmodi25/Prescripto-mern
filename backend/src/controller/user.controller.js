@@ -6,6 +6,8 @@ const ApiError = require("../utils/ApiError.js");
 const sendEmail = require("../utils/sendMail.js");
 const crypto = require("crypto");
 const uploadOnCLoudinary = require("../utils/uploadOnCLoudinary.js");
+const DoctorModel = require("../models/doctor.models.js");
+const AppointmentModel = require("../models/appointment.models.js");
 
 // for generate Token
 const generateToken = async function (userId) {
@@ -421,6 +423,72 @@ const getLoggedUserDetails = asyncHandler(async function (req, res) {
     .json(new ApiResponse(200, "SuccessFully Fetched User Details", user));
 });
 
+// api to booked appointment by user
+
+const toBookedAppointment = asyncHandler(async function (req, res) {
+  const userId = req.user._id;
+
+  const { doctorId, slotDate, slotTime } = req.body;
+
+  if (
+    [doctorId, slotDate, slotTime].some(
+      (item) => String(item || "").trim() === ""
+    )
+  ) {
+    return res.status(400).json(new ApiResponse(400, "All Field are Required"));
+  }
+
+  const doctorData = await DoctorModel.findById(doctorId).select("-password");
+
+  if (
+    doctorData.availability == "Unavailable" ||
+    doctorData.availability == "On Leave"
+  ) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Currently Doctor is not Available"));
+  }
+
+  let slot_booked = doctorData.slot_booked;
+
+  if (slot_booked[slotDate]) {
+    if (slot_booked[slotDate].includes(slotTime)) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, "Slot is not Available"));
+    } else {
+      slot_booked[slotDate].push(slotTime);
+    }
+  } else {
+    slot_booked[slotDate] = [];
+    slot_booked[slotDate].push(slotTime);
+  }
+
+  const userData = await UserModel.findById(userId).select(["-password"]);
+
+  delete doctorData.slot_booked;
+
+  const appointmentData = {
+    userId,
+    doctorId,
+    userData,
+    doctorData,
+    slotTime,
+    slotDate,
+    date: Date.now(),
+    amount: doctorData.fees,
+  };
+
+  const newAppointment = await AppointmentModel.create(appointmentData);
+
+  // save new slot data in doctor data
+  await DoctorModel.findByIdAndUpdate(doctorId, { slot_booked });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Appointment Booked", newAppointment));
+});
+
 module.exports = {
   registerUser,
   userLogin,
@@ -430,4 +498,5 @@ module.exports = {
   userChangePassword,
   updateUserDetails,
   getLoggedUserDetails,
+  toBookedAppointment,
 };

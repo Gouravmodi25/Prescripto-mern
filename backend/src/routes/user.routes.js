@@ -11,6 +11,7 @@ const {
   userChangePassword,
   updateUserDetails,
   getLoggedUserDetails,
+  toBookedAppointment,
 } = require("../controller/user.controller.js");
 const upload = require("../middlewares/multer.middleware.js");
 
@@ -49,5 +50,11 @@ userRouter
 // fetched User Details
 
 userRouter.route("/get-details").get(userAuthentication, getLoggedUserDetails);
+
+// to book appointment
+
+userRouter
+  .route("/booked-appointment")
+  .post(userAuthentication, toBookedAppointment);
 
 module.exports = userRouter;
