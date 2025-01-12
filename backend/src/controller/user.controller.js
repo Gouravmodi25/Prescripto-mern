@@ -449,30 +449,33 @@ const toBookedAppointment = asyncHandler(async function (req, res) {
       .json(new ApiResponse(400, "Currently Doctor is not Available"));
   }
 
-  let slot_booked = doctorData.slot_booked;
-
-  if (slot_booked[slotDate]) {
-    if (slot_booked[slotDate].includes(slotTime)) {
-      return res
-        .status(400)
-        .json(new ApiResponse(400, "Slot is not Available"));
-    } else {
-      slot_booked[slotDate].push(slotTime);
-    }
-  } else {
+  const slot_booked = doctorData.slot_booked || {};
+  if (!slot_booked[slotDate]) {
     slot_booked[slotDate] = [];
-    slot_booked[slotDate].push(slotTime);
   }
+
+  if (slot_booked[slotDate].includes(slotTime)) {
+    return res.status(400).json(new ApiResponse(400, "Slot is not Available"));
+  }
+
+  slot_booked[slotDate].push(slotTime);
 
   const userData = await UserModel.findById(userId).select(["-password"]);
 
-  delete doctorData.slot_booked;
+  if (!userData) {
+    return res.status(404).json(new ApiResponse(404, "User not found"));
+  }
+
+  // delete doctorData.slot_booked;
 
   const appointmentData = {
     userId,
     doctorId,
     userData,
-    doctorData,
+    doctorData: {
+      ...doctorData.toObject(), // Convert Mongoose document to plain object
+      slot_booked: undefined, // Exclude `slot_booked` from doctor data
+    },
     slotTime,
     slotDate,
     date: Date.now(),
@@ -489,6 +492,36 @@ const toBookedAppointment = asyncHandler(async function (req, res) {
     .json(new ApiResponse(200, "Appointment Booked", newAppointment));
 });
 
+// to get list of appointment of user
+
+const toGetListOfAppointment = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const userList = await AppointmentModel.find({ userId });
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          "SuccessFully Retrieving List of Appointment",
+          userList
+        )
+      );
+  } catch (error) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          "Error While Retrieving List Of Appointment",
+          userList
+        )
+      );
+  }
+});
+
 module.exports = {
   registerUser,
   userLogin,
@@ -499,4 +532,5 @@ module.exports = {
   updateUserDetails,
   getLoggedUserDetails,
   toBookedAppointment,
+  toGetListOfAppointment,
 };

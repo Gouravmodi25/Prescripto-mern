@@ -51,7 +51,7 @@ const AppContextProvider = (props) => {
     currencySymbol,
     backendUrl,
     getAllDoctor,
-    cookie,
+    cookie, 
     setCookie,
     userData,
     setUserData,

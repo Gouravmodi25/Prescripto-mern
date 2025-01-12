@@ -60,7 +60,42 @@ const getAllDoctors = asyncHandler(async function (req, res) {
   }
 });
 
+// get booked slot of doctor
+
+const toGetBookedSlot = asyncHandler(async function (req, res) {
+  const { doctorId, date } = req.query; // Expecting doctorId and optional date as query parameters
+
+  // Validate input
+  if (!doctorId) {
+    return res.status(400).json(new ApiResponse(400, "Doctor ID is required"));
+  }
+
+  // Fetch doctor data
+  const doctorData = await DoctorModel.findById(doctorId).select("slot_booked");
+  if (!doctorData) {
+    return res.status(404).json(new ApiResponse(404, "Doctor not found"));
+  }
+
+  const bookedSlots = doctorData.slot_booked || {};
+
+  // If a specific date is requested, filter by that date
+  if (date) {
+    return res.status(200).json(
+      new ApiResponse(200, "Booked Slots for the given date", {
+        date,
+        slots: bookedSlots[date] || [],
+      })
+    );
+  }
+
+  // Return all booked slots if no specific date is provided
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "All Booked Slots", bookedSlots));
+});
+
 module.exports = {
   changeAvailability,
   getAllDoctors,
+  toGetBookedSlot,
 };
