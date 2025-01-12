@@ -97,6 +97,27 @@ const MyAppointment = () => {
       receipt: order.receipt,
       handler: async (response) => {
         console.log(response);
+
+        try {
+          const data = await axios.post(
+            `${backendUrl}/api/user/verify-razorpay-payment`,
+            response,
+            {
+              headers: {
+                Authorization: cookie,
+              },
+            }
+          );
+
+          if (data.data.success) {
+            getUserAppointment();
+            navigate("/my-appointment");
+            toast.success(data.data.message);
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error(error.response?.data.message);
+        }
       },
     };
 
@@ -182,7 +203,12 @@ const MyAppointment = () => {
                 </div>
                 <div></div>
                 <div className="flex flex-col justify-end gap-2">
-                  {!item.cancelled && (
+                  {!item.cancelled && item.payment && (
+                    <button className="sm:min-w-48 py-2 border bg-indigo-100 rounded text-green-500">
+                      Paid
+                    </button>
+                  )}
+                  {!item.cancelled && !item.payment && (
                     <button
                       onClick={() => appointmentRazorpay(item._id)}
                       className="text-stone-500 text-sm sm:min-w-48 py-2 text-center border rounded-md hover:bg-primary hover:text-white transition-all duration-300">

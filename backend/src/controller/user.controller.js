@@ -9,6 +9,7 @@ const uploadOnCLoudinary = require("../utils/uploadOnCLoudinary.js");
 const DoctorModel = require("../models/doctor.models.js");
 const AppointmentModel = require("../models/appointment.models.js");
 const razorpayInstance = require("../utils/razorpay.js");
+const { response } = require("express");
 
 // for generate Token
 const generateToken = async function (userId) {
@@ -550,15 +551,47 @@ const toCancelledAppointment = asyncHandler(async function (req, res) {
 
   await DoctorModel.findByIdAndUpdate(doctorId, { slot_booked: slotBooked });
 
-  const newAppointmentData = await AppointmentModel.findById(appointmentId);
+  // refund logic
+
+  let refundResponse = null;
+
+  if (appointmentData.payment) {
+    try {
+      const refund = await razorpayInstance.payments.refund(
+        appointmentData.paymentId,
+        {
+          amount: appointmentData.amount * 100, // Refund full amount
+        }
+      );
+      refundResponse = refund;
+    } catch (error) {
+      console.error("Refund Error:", error.message);
+      return res
+        .status(500)
+        .json(new ApiResponse(500, "Error initiating refund", error.message));
+    }
+  }
+
+  console.log(refundResponse);
+
+  const updatedAppointmentData = await AppointmentModel.findByIdAndUpdate(
+    appointmentId,
+    {
+      refundInitiated: !!refundResponse,
+      refundDetails: refundResponse,
+    },
+    { new: true }
+  );
 
   return res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        "SuccessFully Appointment Cancelled",
-        newAppointmentData
+        refundResponse
+          ? "Appointment cancelled and refund initiated"
+          : "Appointment cancelled successfully",
+        updatedAppointmentData
       )
     );
 });
@@ -589,7 +622,30 @@ const paymentRazorpay = asyncHandler(async function (req, res) {
     .json(new ApiResponse(200, "Make Payment SuccessFully", order));
 });
 
+// api to verify payment
 
+const verifyPayment = asyncHandler(async function (req, res) {
+  const { razorpay_order_id, razorpay_payment_id } = req.body;
+
+  const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
+
+  console.log(orderInfo);
+
+  if (orderInfo.status === "paid") {
+    await AppointmentModel.findByIdAndUpdate(orderInfo.receipt, {
+      payment: true,
+      paymentId: razorpay_payment_id,
+    });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Payment SuccessFully ", orderInfo));
+  } else {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Payment Failed ", orderInfo));
+  }
+});
 
 module.exports = {
   registerUser,
@@ -604,4 +660,5 @@ module.exports = {
   toGetListOfAppointment,
   toCancelledAppointment,
   paymentRazorpay,
+  verifyPayment,
 };

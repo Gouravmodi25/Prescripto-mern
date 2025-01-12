@@ -15,6 +15,7 @@ const {
   toGetListOfAppointment,
   toCancelledAppointment,
   paymentRazorpay,
+  verifyPayment,
 } = require("../controller/user.controller.js");
 const upload = require("../middlewares/multer.middleware.js");
 
@@ -74,5 +75,11 @@ userRouter
 
 // make razorpay payment
 userRouter.route("/payment").post(userAuthentication, paymentRazorpay);
+
+// verify payment
+
+userRouter
+  .route("/verify-razorpay-payment")
+  .post(userAuthentication, verifyPayment);
 
 module.exports = userRouter;
