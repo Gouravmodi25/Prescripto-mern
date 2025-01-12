@@ -28,47 +28,61 @@ const Appointment = () => {
   };
 
   const getAvailableSlots = () => {
+    // Reset the doctor slots
     setDocSlots([]);
 
-    let today = new Date();
+    const today = new Date();
 
+    // Determine the starting day based on the current time
+    let startDay = 0;
+    const currentHour = today.getHours();
+    const currentMinute = today.getMinutes();
+
+    // Skip today if the time has passed 10:00 PM
+    if (currentHour >= 22 || (currentHour === 21 && currentMinute > 30)) {
+      startDay = 1;
+    }
+
+    // Generate slots for the next 7 valid days
     for (let i = 0; i < 7; i++) {
-      // get date with index
+      // Calculate the date for the current slot day
+      const currentDate = new Date(today);
+      currentDate.setDate(today.getDate() + startDay + i);
 
-      let currentDate = new Date(today);
-      currentDate.setDate(today.getDate() + i);
-
-      // setting end time of day with index
-      let endTime = new Date();
-      endTime.setDate(today.getDate() + i);
-      endTime.setHours(22, 0, 0, 0);
-
-      if (today.getDate() === currentDate.getDate()) {
-        currentDate.setHours(
-          currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10
-        );
+      // Set the start time of the current day
+      if (i === 0 && startDay === 0) {
+        // For today, start from the next available slot
+        const currentHour = currentDate.getHours();
+        currentDate.setHours(currentHour > 10 ? currentHour + 1 : 10);
         currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30 : 0);
       } else {
-        currentDate.setHours(10);
-        currentDate.setMinutes(0);
+        // For future days, start from 10:00 AM
+        currentDate.setHours(10, 0, 0, 0);
       }
 
-      let timeSlots = [];
+      // Set the end time to 10:00 PM for the current day
+      const endTime = new Date(currentDate);
+      endTime.setHours(22, 0, 0, 0);
 
+      const timeSlots = [];
+
+      // Generate time slots in 30-minute increments
       while (currentDate < endTime) {
-        let formattedTime = currentDate.toLocaleTimeString([], {
+        const formattedTime = currentDate.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         });
+
         timeSlots.push({
-          date: new Date(currentDate),
+          date: new Date(currentDate), // Clone the current date
           time: formattedTime,
         });
 
-        // increment time by 30 minutes
+        // Increment time by 30 minutes
         currentDate.setMinutes(currentDate.getMinutes() + 30);
       }
 
+      // Add the generated time slots to the state
       setDocSlots((prev) => [...prev, timeSlots]);
     }
   };
@@ -269,11 +283,17 @@ const Appointment = () => {
                 );
               })}
           </div>
-          <button
-            onClick={bookedAppointment}
-            className="cursor-pointer px-14 py-3 text-white bg-primary rounded-full my-6">
-            Book an appointment
-          </button>
+          {docInfo.availability == "Available" ? (
+            <button
+              onClick={bookedAppointment}
+              className="cursor-pointer px-14 py-3 text-white bg-primary rounded-full my-6">
+              Book an appointment
+            </button>
+          ) : (
+            <button className="cursor-not-allowed px-14 py-3 text-white bg-red-500 rounded-full my-6">
+              Not available
+            </button>
+          )}
         </div>
         {/* {related doctor} */}
         <RelatedDoctor doctorId={doctorId} speciality={docInfo.speciality} />

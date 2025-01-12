@@ -8,6 +8,7 @@ const crypto = require("crypto");
 const uploadOnCLoudinary = require("../utils/uploadOnCLoudinary.js");
 const DoctorModel = require("../models/doctor.models.js");
 const AppointmentModel = require("../models/appointment.models.js");
+const razorpayInstance = require("../utils/razorpay.js");
 
 // for generate Token
 const generateToken = async function (userId) {
@@ -512,15 +513,83 @@ const toGetListOfAppointment = asyncHandler(async (req, res) => {
   } catch (error) {
     return res
       .status(400)
-      .json(
-        new ApiResponse(
-          400,
-          "Error While Retrieving List Of Appointment",
-          userList
-        )
-      );
+      .json(new ApiResponse(400, "Error While Retrieving List Of Appointment"));
   }
 });
+
+const toCancelledAppointment = asyncHandler(async function (req, res) {
+  const { appointmentId } = req.body;
+
+  const userId = req.user._id;
+
+  console.log(userId);
+
+  const appointmentData = await AppointmentModel.findById(appointmentId);
+
+  console.log(appointmentData);
+
+  if (appointmentData.userId !== userId.toString()) {
+    return res.status(400).json(new ApiResponse(400, "Unauthorized Action"));
+  }
+
+  await AppointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true });
+
+  // releasing doctor slot
+
+  const { doctorId, slotDate, slotTime } = appointmentData;
+
+  const doctorData = await DoctorModel.findById(doctorId);
+
+  let slotBooked = doctorData.slot_booked;
+
+  slotBooked[slotDate] = slotBooked[slotDate].filter(
+    (item) => item != slotTime
+  );
+
+  console.log(slotBooked);
+
+  await DoctorModel.findByIdAndUpdate(doctorId, { slot_booked: slotBooked });
+
+  const newAppointmentData = await AppointmentModel.findById(appointmentId);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        "SuccessFully Appointment Cancelled",
+        newAppointmentData
+      )
+    );
+});
+
+// api to make payment of appointment using razorpay
+
+const paymentRazorpay = asyncHandler(async function (req, res) {
+  const { appointmentId } = req.body;
+
+  const appointmentData = await AppointmentModel.findById(appointmentId);
+
+  if (!appointmentData || appointmentData.cancelled) {
+    return res.status(400).json(new ApiResponse(400, "Appointment Cancelled"));
+  }
+
+  const options = {
+    amount: appointmentData.amount * 100,
+    currency: process.env.CURRENCY,
+    receipt: appointmentId,
+  };
+
+  // creation of order
+
+  const order = await razorpayInstance.orders.create(options);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Make Payment SuccessFully", order));
+});
+
+
 
 module.exports = {
   registerUser,
@@ -533,4 +602,6 @@ module.exports = {
   getLoggedUserDetails,
   toBookedAppointment,
   toGetListOfAppointment,
+  toCancelledAppointment,
+  paymentRazorpay,
 };

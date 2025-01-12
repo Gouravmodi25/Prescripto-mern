@@ -13,6 +13,8 @@ const {
   getLoggedUserDetails,
   toBookedAppointment,
   toGetListOfAppointment,
+  toCancelledAppointment,
+  paymentRazorpay,
 } = require("../controller/user.controller.js");
 const upload = require("../middlewares/multer.middleware.js");
 
@@ -63,5 +65,14 @@ userRouter
 userRouter
   .route("/list-of-appointment")
   .get(userAuthentication, toGetListOfAppointment);
+
+// cancelled Appointment
+
+userRouter
+  .route("/to-cancel-appointment")
+  .patch(userAuthentication, toCancelledAppointment);
+
+// make razorpay payment
+userRouter.route("/payment").post(userAuthentication, paymentRazorpay);
 
 module.exports = userRouter;

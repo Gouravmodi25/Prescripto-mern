@@ -51,7 +51,7 @@ const AppContextProvider = (props) => {
     currencySymbol,
     backendUrl,
     getAllDoctor,
-    cookie, 
+    cookie,
     setCookie,
     userData,
     setUserData,
@@ -59,6 +59,7 @@ const AppContextProvider = (props) => {
   };
 
   useEffect(() => {
+    console.log(cookie);
     if (cookie) {
       loadUserData();
     } else {
