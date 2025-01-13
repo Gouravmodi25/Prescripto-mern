@@ -7,6 +7,7 @@ const {
   forgotPassword,
   resetPassword,
   logoutDoctor,
+  changePasswordDoctor,
 } = require("../controller/doctor.controller.js");
 
 const doctorAuthentication = require("../middlewares/doctorAuthentication.js");
@@ -36,5 +37,11 @@ doctorRouter.route("/reset-password/:resetToken").post(resetPassword);
 // logout doctor
 
 doctorRouter.route("/logout-doctor").post(doctorAuthentication, logoutDoctor);
+
+// change password route
+
+doctorRouter
+  .route("/change-password")
+  .post(doctorAuthentication, changePasswordDoctor);
 
 module.exports = doctorRouter;

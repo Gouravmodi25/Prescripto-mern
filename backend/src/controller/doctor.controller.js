@@ -318,6 +318,42 @@ const logoutDoctor = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Doctor Logged out", doctor));
 });
 
+// change password api
+const changePasswordDoctor = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  const doctor = await DoctorModel.findById(req.doctor._id).select("+password");
+
+  const isDoctorPasswordCorrect = await doctor.isCorrectPassword(oldPassword);
+
+  if (!isDoctorPasswordCorrect) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Old Password is incorrect"));
+  }
+
+  const isSamePassword = await doctor.isSamePassword(newPassword);
+
+  if (isSamePassword) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(400, "New Password should not same as old Password")
+      );
+  }
+
+  doctor.password = newPassword;
+  await doctor.save({ validateBeforeSave: false });
+
+  const newDoctor = await DoctorModel.findById(req.doctor._id).select(
+    "-password"
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Password Changed Successfully", newDoctor));
+});
+
 module.exports = {
   changeAvailability,
   getAllDoctors,
@@ -326,4 +362,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   logoutDoctor,
+  changePasswordDoctor,
 };

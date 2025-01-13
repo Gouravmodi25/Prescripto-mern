@@ -9,6 +9,9 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 import DoctorLogin from "./pages/DoctorLogin.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Sidebar from "./components/Sidebar.jsx";
+import DoctorDashboard from "./pages/Doctor/DoctorDashboard.jsx";
+import DoctorAppointment from "./pages/Doctor/DoctorAppointment.jsx";
+import DoctorProfile from "./pages/Doctor/DoctorProfile.jsx";
 
 const AppLayout = ({ children }) => (
   <div className=" bg-[#f8f9fd]">
@@ -35,6 +38,15 @@ const App = () => {
               <AppLayout className="box-border">
                 <Routes>
                   <Route path="/change-password" element={<ChangePassword />} />
+                  <Route
+                    path="/doctor-dashboard"
+                    element={<DoctorDashboard />}
+                  />
+                  <Route path="/doctor-profile" element={<DoctorProfile />} />
+                  <Route
+                    path="/doctor-appointment"
+                    element={<DoctorAppointment />}
+                  />
                 </Routes>
               </AppLayout>
             }
