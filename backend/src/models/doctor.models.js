@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const doctorSchema = new mongoose.Schema(
   {
@@ -68,6 +70,15 @@ const doctorSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
+    accessToken: {
+      type: String,
+    },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordTokenExpiry: {
+      type: Date,
+    },
   },
   { minimize: false, timestamps: true }
 );
@@ -86,6 +97,30 @@ doctorSchema.methods.isSamePassword = async function (password) {
 
 doctorSchema.methods.isCorrectPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
+};
+
+doctorSchema.methods.generateToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+    },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: "3d",
+    }
+  );
+};
+
+doctorSchema.methods.getResetPasswordToken = function () {
+  const resetToken = crypto.randomBytes(20).toString("hex");
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.resetPasswordTokenExpiry = Date.now() + 10 * (60 * 1000);
+  return resetToken;
 };
 
 const DoctorModel = mongoose.model("Doctors", doctorSchema);

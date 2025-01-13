@@ -295,8 +295,8 @@ const forgotPassword = asyncHandler(async function (req, res) {
       .json(new ApiResponse(200, "Email sent successfully", newAdmin));
   } catch (error) {
     admin.resetPasswordToken = undefined;
-    user.resetPasswordTokenExpiry = undefined;
-    await user.save({ validationBeforeSave: false });
+    admin.resetPasswordTokenExpiry = undefined;
+    await admin.save({ validationBeforeSave: false });
 
     return res
       .status(500)
