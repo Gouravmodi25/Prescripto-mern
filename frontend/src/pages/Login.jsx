@@ -17,9 +17,8 @@ const Login = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
-    // for Sign up
     try {
-      if (state == "Sign up") {
+      if (state === "Sign up") {
         const data = await axios.post(
           `${backendUrl}/api/user/user-register`,
           {
@@ -33,9 +32,6 @@ const Login = () => {
         );
 
         const cookie = Cookies.get("accessToken");
-        console.log(cookie);
-        console.log(data);
-
         if (data.data.success) {
           localStorage.setItem("access-token", cookie);
           setCookie(cookie);
@@ -54,12 +50,10 @@ const Login = () => {
             password: String(password),
           },
           {
-            withCredentials: true, // Ensures the cookie is sent with the request
+            withCredentials: true,
           }
         );
         const cookie = Cookies.get("accessToken");
-        console.log(cookie);
-        console.log(data);
         if (data.data.success) {
           localStorage.setItem("access-token", cookie);
           setCookie(cookie);
@@ -82,23 +76,25 @@ const Login = () => {
   };
 
   useEffect(() => {
+    // Redirect logged-in users to the home page
     if (cookie) {
       navigate("/");
     }
-  });
+  }, [cookie, navigate]);
 
   return (
     <form
       onSubmit={(e) => onSubmitHandler(e)}
       className="min-h-[80vh] flex items-center">
-      <div className="flex flex-col gap-3 m-auto border  items-start p-6 min-w-[300px] sm:min-w-[396PX] rounded-2xl text-zinc-600 text-sm shadow-lg">
+      <div className="flex flex-col gap-3 m-auto border items-start p-6 min-w-[300px] sm:min-w-[396PX] rounded-2xl text-zinc-600 text-sm shadow-lg">
         <p className="text-2xl font-semibold">
-          {state == "Sign up" ? "Create account" : "Login"}
+          {state === "Sign up" ? "Create account" : "Login"}
         </p>
         <p>
-          Please {state == "Sign up" ? "sign up" : "login"} to book appointment
+          Please {state === "Sign up" ? "sign up" : "login"} to book an
+          appointment
         </p>
-        {state == "Sign up" && (
+        {state === "Sign up" && (
           <div className="w-full">
             <p>Full Name</p>
             <input
@@ -136,15 +132,15 @@ const Login = () => {
             <button
               onClick={togglePasswordVisibility}
               type="button"
-              className="absolute  inset-y-[43px] right-3 flex items-center text-gray-500 hover:text-blue-500">
+              className="absolute inset-y-[43px] right-3 flex items-center text-gray-500 hover:text-blue-500">
               {showPassword ? "🙈" : "👁️"}
             </button>
           )}
         </div>
         <button className="bg-primary text-base rounded-lg w-full p-2 text-white outline-none">
-          {state == "Sign up" ? "Create Account" : "Login"}
+          {state === "Sign up" ? "Create Account" : "Login"}
         </button>
-        {state == "Login" && (
+        {state === "Login" && (
           <p>
             Forgot Password?{" "}
             <Link className="cursor-pointer text-primary" to="/forgot-password">
@@ -152,7 +148,7 @@ const Login = () => {
             </Link>
           </p>
         )}
-        {state == "Sign up" ? (
+        {state === "Sign up" ? (
           <p>
             Already have an account?{" "}
             <span
@@ -163,7 +159,7 @@ const Login = () => {
           </p>
         ) : (
           <p>
-            Create an new account?{" "}
+            Create a new account?{" "}
             <span
               onClick={() => setState("Sign up")}
               className="text-primary cursor-pointer">

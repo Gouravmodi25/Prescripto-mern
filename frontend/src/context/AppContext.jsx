@@ -67,6 +67,13 @@ const AppContextProvider = (props) => {
     }
   }, [cookie]);
 
+  useEffect(() => {
+    const savedToken = Cookies.get("accessToken");
+    if (savedToken) {
+      setCookie(savedToken);
+    }
+  }, []);
+
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
   );

@@ -7,6 +7,8 @@ const uploadOnCloudinary = require("../utils/uploadOnCLoudinary.js");
 const AdminModel = require("../models/admin.models.js");
 const sendEmail = require("../utils/sendMail.js");
 const crypto = require("crypto");
+const AppointmentModel = require("../models/appointment.models.js");
+const razorpayInstance = require("../utils/razorpay.js");
 
 // generate access token for admin
 const generateToken = async function (admin_id) {
@@ -232,7 +234,9 @@ const loginAdmin = asyncHandler(async function (req, res) {
   const accessToken = await generateToken(admin._id);
 
   const options = {
-    secure: true,
+    // Prevent JavaScript access
+    secure: true, // Enable secure cookies in production
+    maxAge: 24 * 60 * 60 * 1000,
   };
 
   const loggedAdmin = await AdminModel.findById(admin._id).select("-password");
@@ -434,6 +438,104 @@ const getAllDoctor = asyncHandler(async (req, res) => {
   }
 });
 
+const getAllAppointmentForAdmin = asyncHandler(async (req, res) => {
+  try {
+    const appointmentData = await AppointmentModel.find({});
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          "Successfully retrieve all appointment",
+          appointmentData
+        )
+      );
+  } catch (error) {
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(
+          500,
+          "Failed to  retrieve all appointment",
+          appointmentData
+        )
+      );
+  }
+});
+
+// to cancel appointment
+
+const toCancelledAppointment = asyncHandler(async function (req, res) {
+  const { appointmentId } = req.body;
+
+  const appointmentData = await AppointmentModel.findById(appointmentId);
+
+  console.log(appointmentData);
+
+  await AppointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true });
+
+  // releasing doctor slot
+
+  const { doctorId, slotDate, slotTime } = appointmentData;
+
+  const doctorData = await DoctorModel.findById(doctorId);
+
+  let slotBooked = doctorData.slot_booked;
+
+  slotBooked[slotDate] = slotBooked[slotDate].filter(
+    (item) => item != slotTime
+  );
+
+  console.log(slotBooked);
+
+  await DoctorModel.findByIdAndUpdate(doctorId, { slot_booked: slotBooked });
+
+  // refund logic
+
+  let refundResponse = null;
+
+  if (appointmentData.payment) {
+    try {
+      const refund = await razorpayInstance.payments.refund(
+        appointmentData.paymentId,
+        {
+          amount: appointmentData.amount * 100, // Refund full amount
+        }
+      );
+      refundResponse = refund;
+    } catch (error) {
+      console.error("Refund Error:", error.message);
+      return res
+        .status(500)
+        .json(new ApiResponse(500, "Error initiating refund", error.message));
+    }
+  }
+
+  console.log(refundResponse);
+
+  const updatedAppointmentData = await AppointmentModel.findByIdAndUpdate(
+    appointmentId,
+    {
+      refundInitiated: !!refundResponse,
+      refundDetails: refundResponse,
+    },
+    { new: true }
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        refundResponse
+          ? "Appointment cancelled and refund initiated"
+          : "Appointment cancelled successfully",
+        updatedAppointmentData
+      )
+    );
+});
+
 module.exports = {
   addDoctor,
   registerAdminAccount,
@@ -443,4 +545,6 @@ module.exports = {
   forgotPassword,
   resetPassword,
   getAllDoctor,
+  getAllAppointmentForAdmin,
+  toCancelledAppointment,
 };

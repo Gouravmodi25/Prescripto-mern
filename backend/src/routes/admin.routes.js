@@ -9,6 +9,8 @@ const {
   forgotPassword,
   resetPassword,
   getAllDoctor,
+  getAllAppointmentForAdmin,
+  toCancelledAppointment,
 } = require("../controller/admin.controller.js");
 const adminAuthentication = require("../middlewares/adminAuth.middleware.js");
 const { changeAvailability } = require("../controller/doctor.controller.js");
@@ -46,5 +48,17 @@ adminRouter.route("/all-doctors").post(adminAuthentication, getAllDoctor);
 adminRouter
   .route("/change-availability")
   .patch(adminAuthentication, changeAvailability);
+
+// get all appointment
+
+adminRouter
+  .route("/get-all-appointments")
+  .get(adminAuthentication, getAllAppointmentForAdmin);
+
+// to cancelled appointment for admin
+
+adminRouter
+  .route("/cancelled-appointment")
+  .post(adminAuthentication, toCancelledAppointment);
 
 module.exports = adminRouter;

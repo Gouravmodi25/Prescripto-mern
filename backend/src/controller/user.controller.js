@@ -9,7 +9,6 @@ const uploadOnCLoudinary = require("../utils/uploadOnCLoudinary.js");
 const DoctorModel = require("../models/doctor.models.js");
 const AppointmentModel = require("../models/appointment.models.js");
 const razorpayInstance = require("../utils/razorpay.js");
-const { response } = require("express");
 
 // for generate Token
 const generateToken = async function (userId) {
@@ -500,21 +499,35 @@ const toGetListOfAppointment = asyncHandler(async (req, res) => {
   try {
     const userId = req.user._id;
 
+    // Validate that userId exists
+    if (!userId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, "User ID is required", null));
+    }
+
+    // Fetch appointments for the user
     const userList = await AppointmentModel.find({ userId });
 
+    // Return success response with the list of appointments
     return res
       .status(200)
       .json(
         new ApiResponse(
           200,
-          "SuccessFully Retrieving List of Appointment",
+          "Successfully retrieved list of appointments",
           userList
         )
       );
   } catch (error) {
+    console.error("Error retrieving list of appointments:", error.message);
+
+    // Return error response
     return res
-      .status(400)
-      .json(new ApiResponse(400, "Error While Retrieving List Of Appointment"));
+      .status(500)
+      .json(
+        new ApiResponse(500, "Failed to retrieve list of appointments", null)
+      );
   }
 });
 
