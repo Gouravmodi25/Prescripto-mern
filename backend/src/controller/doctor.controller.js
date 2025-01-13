@@ -4,6 +4,7 @@ const DoctorModel = require("../models/doctor.models.js");
 const validator = require("validator");
 const ApiError = require("../utils/ApiError.js");
 const sendEmail = require("../utils/sendMail.js");
+const crypto = require("crypto");
 
 // generate access token for admin
 const generateToken = async function (doctor_id) {
@@ -162,7 +163,7 @@ const loginDoctor = asyncHandler(async (req, res) => {
   );
 
   return res.status(200).cookie("accessToken", accessToken, options).json(
-    new ApiResponse(200, "Admin Logged In SuccessFully", {
+    new ApiResponse(200, "Doctor Logged In SuccessFully", {
       loggedDoctor,
       accessToken,
     })
@@ -191,6 +192,8 @@ const forgotPassword = asyncHandler(async function (req, res) {
   }
 
   const resetToken = doctor.getResetPasswordToken();
+
+  console.log(resetToken);
 
   await doctor.save({ validateBeforeSave: true });
 
@@ -227,10 +230,100 @@ const forgotPassword = asyncHandler(async function (req, res) {
   }
 });
 
+// reset password api for doctor
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { newPassword, confirmPassword } = req.body;
+
+  if (
+    [newPassword, confirmPassword].some(
+      (item) => String(item || "").trim() === ""
+    )
+  ) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "All fields are required"));
+  }
+
+  if (newPassword.length < 8) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(400, "Password must be at least 8 characters long")
+      );
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Both passwords should be the same"));
+  }
+
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.resetToken)
+    .digest("hex");
+
+  console.log("Reset token received:", req.params.resetToken);
+  console.log("Hashed reset token:", resetPasswordToken);
+
+  const doctor = await DoctorModel.findOne({
+    resetPasswordToken: resetPasswordToken,
+    resetPasswordTokenExpiry: { $gt: Date.now() },
+  });
+
+  console.log("Doctor found in database:", doctor);
+
+  if (!doctor) {
+    return res.status(400).json(new ApiResponse(400, "Invalid Reset Token"));
+  }
+
+  doctor.password = newPassword;
+  doctor.resetPasswordToken = undefined;
+  doctor.resetPasswordTokenExpiry = undefined;
+
+  await doctor.save({ validateBeforeSave: false });
+
+  const newDoctor = await DoctorModel.findOne({ _id: doctor._id }).select(
+    "-password"
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Password Changed Successfully", newDoctor));
+});
+
+// logout handler
+
+const logoutDoctor = asyncHandler(async (req, res) => {
+  const doctor = await DoctorModel.findByIdAndUpdate(
+    req.doctor._id,
+    {
+      $unset: {
+        accessToken: 1,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+  const options = {
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, "Doctor Logged out", doctor));
+});
+
 module.exports = {
   changeAvailability,
   getAllDoctors,
   toGetBookedSlot,
   loginDoctor,
   forgotPassword,
+  resetPassword,
+  logoutDoctor,
 };

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("../utils/asyncHandler.js");
-const AdminModel = require("../models/admin.models.js");
 const ApiResponse = require("../utils/ApiResponse.js");
+const DoctorModel = require("../models/doctor.models.js");
 
 const doctorAuthentication = asyncHandler(async function (req, res, next) {
   try {
@@ -25,10 +25,12 @@ const doctorAuthentication = asyncHandler(async function (req, res, next) {
         );
     }
 
+    console.log(decodedToken._id);
+
     let loggedInDoctor;
     try {
       // Find admin by ID from the token
-      loggedInDoctor = await AdminModel.findById(decodedToken._id).select(
+      loggedInDoctor = await DoctorModel.findById(decodedToken._id).select(
         "-password"
       );
     } catch (error) {
@@ -47,7 +49,7 @@ const doctorAuthentication = asyncHandler(async function (req, res, next) {
         .json(new ApiResponse(401, "Not Authorized Login Again"));
     }
 
-    req.admin = loggedInDoctor;
+    req.doctor = loggedInDoctor;
     next();
   } catch (error) {
     return res

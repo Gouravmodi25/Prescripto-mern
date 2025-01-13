@@ -14,7 +14,7 @@ const Navbar = () => {
     try {
       // Call the logout API
       const response = await axios.post(
-        `${backendUrl}/api/admin/admin-loggedOut`,
+        `${backendUrl}/api/doctor/logout-doctor`,
         {},
         {
           headers: {

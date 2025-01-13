@@ -28,10 +28,10 @@ const ResetPassword = () => {
 
     try {
       const data = await axios.post(
-        `${backendUrl}/api/admin/resetPassword/${resetToken}`,
+        `${backendUrl}/api/doctor/reset-password/${resetToken}`,
         {
           newPassword: String(password),
-          confirmNewPassword: String(confirmPassword),
+          confirmPassword: String(confirmPassword),
         }
       );
 

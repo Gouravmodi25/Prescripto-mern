@@ -5,7 +5,11 @@ const {
   toGetBookedSlot,
   loginDoctor,
   forgotPassword,
+  resetPassword,
+  logoutDoctor,
 } = require("../controller/doctor.controller.js");
+
+const doctorAuthentication = require("../middlewares/doctorAuthentication.js");
 
 const doctorRouter = Router();
 
@@ -24,5 +28,13 @@ doctorRouter.route("/login").post(loginDoctor);
 // forgot password route
 
 doctorRouter.route("/forgot-password").post(forgotPassword);
+
+// reset password
+
+doctorRouter.route("/reset-password/:resetToken").post(resetPassword);
+
+// logout doctor
+
+doctorRouter.route("/logout-doctor").post(doctorAuthentication, logoutDoctor);
 
 module.exports = doctorRouter;
