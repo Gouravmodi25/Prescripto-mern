@@ -42,6 +42,9 @@ const Navbar = () => {
     } catch (error) {
       console.error("Logout error:", error.response.data.message);
       toast.error("Failed to log out. Please try again.");
+      Cookies.remove("accessToken");
+      localStorage.removeItem("access-token");
+      window.location.reload();
     } finally {
       // Clear local storage and cookies
       Cookies.remove("accessToken");
@@ -51,7 +54,7 @@ const Navbar = () => {
       setCookie("");
 
       // Redirect to login page
-      navigate("/");
+      navigate("/login");
     }
   };
 

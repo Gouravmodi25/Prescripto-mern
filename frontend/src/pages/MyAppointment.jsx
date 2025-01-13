@@ -65,7 +65,17 @@ const MyAppointment = () => {
 
       if (response.data.success) {
         toast.success(response.data.message);
-        getUserAppointment();
+
+        // Update the `appointments` state locally
+        const updatedAppointment = response.data.data; // Assuming the API returns updated appointment data
+        setAppointments((prevAppointments) =>
+          prevAppointments.map((appt) =>
+            appt._id === updatedAppointment._id
+              ? updatedAppointment // Replace with the updated appointment
+              : appt
+          )
+        );
+        await getUserAppointment();
       } else {
         toast.error(response.data.message);
       }

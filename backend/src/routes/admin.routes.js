@@ -11,6 +11,7 @@ const {
   getAllDoctor,
   getAllAppointmentForAdmin,
   toCancelledAppointment,
+  toGetAdminDashboard,
 } = require("../controller/admin.controller.js");
 const adminAuthentication = require("../middlewares/adminAuth.middleware.js");
 const { changeAvailability } = require("../controller/doctor.controller.js");
@@ -60,5 +61,11 @@ adminRouter
 adminRouter
   .route("/cancelled-appointment")
   .post(adminAuthentication, toCancelledAppointment);
+
+// to fetch dashboard data
+
+adminRouter
+  .route("/get-dashboard-data")
+  .get(adminAuthentication, toGetAdminDashboard);
 
 module.exports = adminRouter;

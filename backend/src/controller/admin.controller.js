@@ -9,6 +9,7 @@ const sendEmail = require("../utils/sendMail.js");
 const crypto = require("crypto");
 const AppointmentModel = require("../models/appointment.models.js");
 const razorpayInstance = require("../utils/razorpay.js");
+const UserModel = require("../models/user.models.js");
 
 // generate access token for admin
 const generateToken = async function (admin_id) {
@@ -536,6 +537,29 @@ const toCancelledAppointment = asyncHandler(async function (req, res) {
     );
 });
 
+// to get dashboard of doctor patient and appointment
+
+const toGetAdminDashboard = asyncHandler(async (req, res) => {
+  try {
+    const doctorData = await DoctorModel.find({});
+    const appointmentData = await AppointmentModel.find({});
+    const userData = await UserModel.find({});
+
+    const dashboardData = {
+      doctors: doctorData.length,
+      patient: userData.length,
+      appointments: appointmentData.length,
+      latestAppointment: appointmentData.reverse().slice(0, 5),
+    };
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Successfully fetched data", dashboardData));
+  } catch (error) {
+    return res.status(400).json(new ApiResponse(400, "Failed to Fetch Data"));
+  }
+});
+
 module.exports = {
   addDoctor,
   registerAdminAccount,
@@ -547,4 +571,5 @@ module.exports = {
   getAllDoctor,
   getAllAppointmentForAdmin,
   toCancelledAppointment,
+  toGetAdminDashboard,
 };

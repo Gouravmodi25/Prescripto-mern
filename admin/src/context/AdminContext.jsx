@@ -7,11 +7,14 @@ export const AdminContext = createContext();
 
 const AdminContextProvider = function (props) {
   const [cookie, setCookie] = useState(
-    Cookies.get("accessToken") ? Cookies.get("accessToken") : ""
+    localStorage.getItem("access-token")
+      ? localStorage.getItem("access-token")
+      : ""
   );
 
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [dashData, setDashData] = useState([]);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -43,7 +46,7 @@ const AdminContextProvider = function (props) {
 
   const getAllAppointments = async () => {
     try {
-      const data = await axios.get(
+      const response = await axios.get(
         `${backendUrl}/api/admin/get-all-appointments`,
         {
           headers: {
@@ -52,20 +55,28 @@ const AdminContextProvider = function (props) {
         }
       );
 
-      if (data.data.success) {
-        setAppointments(data.data.data);
+      if (response.data.success) {
+        setAppointments(response.data.data);
+
+        // Update dashData.latestAppointment if needed
+        setDashData((prevState) => ({
+          ...prevState,
+          latestAppointment: response.data.data,
+        }));
       } else {
-        toast.error(data.data.message);
+        toast.error(response.data.message);
       }
     } catch (error) {
-      toast.error(error.response?.data.message);
+      toast.error(
+        error.response?.data.message || "Unable to fetch appointments."
+      );
     }
   };
 
   // for cancelled appointment by admin
   const cancelledAppointment = async (appointmentId) => {
     try {
-      const data = await axios.post(
+      const response = await axios.post(
         `${backendUrl}/api/admin/cancelled-appointment`,
         { appointmentId },
         {
@@ -75,8 +86,44 @@ const AdminContextProvider = function (props) {
         }
       );
 
+      if (response.data.success) {
+        toast.success(response.data.message);
+
+        // Update dashData.latestAppointment locally
+        const updatedAppointments = dashData.latestAppointment.map((appt) =>
+          appt._id === appointmentId ? { ...appt, cancelled: true } : appt
+        );
+
+        setDashData((prevState) => ({
+          ...prevState,
+          latestAppointment: updatedAppointments,
+        }));
+
+        // Optional: Re-fetch appointments for consistency
+        getAllAppointments();
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data.message || "Something went wrong.");
+    }
+  };
+
+  // get dashboard data
+
+  const toGetDashboardData = async () => {
+    try {
+      const data = await axios.get(
+        `${backendUrl}/api/admin/get-dashboard-data`,
+        {
+          headers: {
+            Authorization: cookie,
+          },
+        }
+      );
+
       if (data.data.success) {
-        toast.success(data.data.message);
+        setDashData(data.data.data);
         getAllAppointments();
       } else {
         toast.error(data.data.message);
@@ -103,6 +150,8 @@ const AdminContextProvider = function (props) {
     setAppointments,
     getAllAppointments,
     cancelledAppointment,
+    dashData,
+    toGetDashboardData,
   };
 
   return (

@@ -8,7 +8,9 @@ export const AppContext = createContext(null);
 
 const AppContextProvider = (props) => {
   const [cookie, setCookie] = useState(
-    Cookies.get("accessToken") ? Cookies.get("accessToken") : ""
+    localStorage.getItem("access-token")
+      ? localStorage.getItem("access-token")
+      : ""
   );
   const [userData, setUserData] = useState(false);
   const [doctors, setDoctors] = useState([]);

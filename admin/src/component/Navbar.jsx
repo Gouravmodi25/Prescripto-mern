@@ -27,12 +27,16 @@ const Navbar = () => {
       // Handle API response
       if (response.data.success) {
         toast.success(response.data.message || "Logged out successfully!");
+        window.location.reload();
       } else {
         toast.warn("Logout API responded but did not succeed.");
       }
     } catch (error) {
       console.error("Logout error:", error.response.data.message);
       toast.error("Failed to log out. Please try again.");
+      Cookies.remove("accessToken");
+      localStorage.removeItem("access-token");
+      window.location.reload();
     } finally {
       // Clear local storage and cookies
       Cookies.remove("accessToken");
