@@ -211,6 +211,8 @@ const forgotPassword = asyncHandler(async function (req, res) {
 
     const newDoctor = await DoctorModel.findOne(doctor._id).select("-password");
 
+    console.log(newDoctor);
+
     return res
       .status(200)
       .json(new ApiResponse(200, "Email sent successfully", newDoctor));
