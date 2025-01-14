@@ -30,7 +30,7 @@ const Dashboard = () => {
   return (
     dashData && (
       <div className="m-5">
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 ">
           <div className="flex items-center gap-2 bg-white p-4 rounded border-2 border-gray-100 min-w-52 cursor-pointer hover:scale-105 transition-all duration-200">
             <img className="w-14" src={assets.doctor_icon} alt="doctor_icon" />
             <div>
@@ -69,12 +69,12 @@ const Dashboard = () => {
         </div>
 
         <div className="bg-white">
-          <div className="flex items-center gap-2.5 px-4 py-16 mt-10 rounded-t border">
+          <div className="flex items-center gap-2.5 px-4 py-6 mt-10 rounded-t border">
             <img src={assets.list_icon} alt="list_icon" />
             <p className="font-semibold">Latest Booking</p>
           </div>
 
-          <div className="border border-t-0 pt-4">
+          <div className="border border-t-0 pt-4 max-h-[60vh] overflow-y-scroll">
             {appointmentData && appointmentData.length > 0 ? (
               appointmentData.map((item, index) => (
                 <div
@@ -93,7 +93,11 @@ const Dashboard = () => {
                       Booking on {slotDateFormat(item.slotDate)}
                     </p>
                   </div>
-                  {item.cancelled ? (
+                  {item.isComplete && !item.cancelled ? (
+                    <p className="text-green-500 text-sm font-medium">
+                      Completed
+                    </p>
+                  ) : item.cancelled ? (
                     <p className="text-red-500 text-sm font-medium">
                       Cancelled
                     </p>

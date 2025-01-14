@@ -33,7 +33,7 @@ const DoctorAppointment = () => {
   }, [cookie]);
 
   return (
-    <div className="w-full max-w-6xl m-5 ">
+    <div className="w-full max-w-6xl m-5 px-5 ">
       <p className="mb-3 text-lg font-medium">All Appointments</p>
       <button
         onClick={() => {
@@ -44,8 +44,8 @@ const DoctorAppointment = () => {
         className="mb-3 px-4 py-2 bg-blue-500 text-white rounded">
         Refresh Appointments
       </button>
-      <div className="bg-white border rounded text-sm max-h-[90vh] min-h-[70vh] overflow-y-scroll">
-        <div className=" max-sm:hidden sm:grid grid-cols-[0.5fr_2fr_1fr_1fr_2fr_1fr_1fr]  px-6 py-3 border-b">
+      <div className="bg-white border rounded px-4 py-6 text-sm max-h-[80vh] min-h-[60vh] overflow-y-scroll">
+        <div className=" max-sm:hidden text-center sm:grid grid-cols-[0.5fr_2fr_1fr_1fr_2fr_1fr_2fr]  px-6 py-3 border-b">
           <p>#</p>
           <p>Patient</p>
           <p>Payment</p>
@@ -58,7 +58,7 @@ const DoctorAppointment = () => {
         {appointmentData && appointmentData.length > 0 ? (
           appointmentData.map((item, index) => (
             <div
-              className=" flex flex-wrap justify-between max-sm:gap-3 max-sm:text-base sm:grid grid-cols-[0.5fr_2fr_1fr_1fr_2fr_1fr_1fr]  gap-1 items-center text-gray-500 px-2 py-6 border-b hover:bg-gray-200"
+              className=" flex flex-wrap text-center justify-between max-sm:gap-3 max-sm:text-base sm:grid grid-cols-[0.5fr_2fr_1fr_1fr_2fr_1fr_2fr]  gap-1 items-center text-gray-500 px-2 py-6 border-b hover:bg-gray-200"
               key={item._id || index}>
               <p className="max-sm:hidden">{index + 1}</p>
 
@@ -87,32 +87,30 @@ const DoctorAppointment = () => {
               </p>
               <p>${item.amount || "0.00"}</p>
 
-              {item.cancelled ? (
-                <p className="text-red-500 border border-red-500 p-2 rounded-lg text-sm font-medium">
-                  Cancelled
-                </p>
+              {item.isComplete && !item.cancelled ? (
+                <p className="text-green-500 text-sm font-medium">Completed</p>
+              ) : item.cancelled ? (
+                <p className="text-red-500 text-sm font-medium">Cancelled</p>
               ) : (
                 <div className="flex gap-1">
                   <img
-                    onClick={() => cancelAppointment(item._id)}
-                    className="w-10 cursor-pointer"
-                    src={assets.cancel_icon}
-                    alt=""
+                    onClick={() => completeAppointment(item._id)}
+                    src={assets.tick_icon}
+                    className="w-10 h-10 cursor-pointer"
+                    alt="Cancel Appointment"
                   />
                   <img
-                    onClick={() => completeAppointment(item._id)}
-                    className="w-10 cursor-pointer"
-                    src={assets.tick_icon}
-                    alt=""
+                    onClick={() => cancelAppointment(item._id)}
+                    src={assets.cancel_icon}
+                    className="w-10 h-10 cursor-pointer"
+                    alt="Cancel Appointment"
                   />
                 </div>
               )}
             </div>
           ))
         ) : (
-          <div className="p-6 text-center text-gray-500">
-            No appointments found.
-          </div>
+          <p className="text-center text-gray-500">No appointments found.</p>
         )}
       </div>
     </div>

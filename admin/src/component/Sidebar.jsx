@@ -17,7 +17,7 @@ const Sidebar = () => {
               }`
             }
             to={"/admin-dashboard"}>
-            <img src={assets.home_icon} alt="home_icon" />
+            <img className="min-w-5" src={assets.home_icon} alt="home_icon" />
             <p className="hidden md:block">Dashboard</p>
           </NavLink>
           <NavLink
@@ -27,7 +27,11 @@ const Sidebar = () => {
               }`
             }
             to={"/all-appointment"}>
-            <img src={assets.appointment_icon} alt="appointment_icon" />
+            <img
+              className="min-w-5"
+              src={assets.appointment_icon}
+              alt="appointment_icon"
+            />
             <p className="hidden md:block">Appointments</p>
           </NavLink>
           <NavLink
@@ -37,7 +41,7 @@ const Sidebar = () => {
               }`
             }
             to={"/add-doctor"}>
-            <img src={assets.add_icon} alt="add_icon" />
+            <img className="min-w-5" src={assets.add_icon} alt="add_icon" />
             <p className="hidden md:block">Add Doctor</p>
           </NavLink>
           <NavLink
@@ -47,7 +51,11 @@ const Sidebar = () => {
               }`
             }
             to={"/doctor-list"}>
-            <img src={assets.people_icon} alt="doctor_list" />
+            <img
+              className="min-w-5"
+              src={assets.people_icon}
+              alt="doctor_list"
+            />
             <p className="hidden md:block">Doctors List</p>
           </NavLink>
           <NavLink
@@ -57,7 +65,11 @@ const Sidebar = () => {
               }`
             }
             to={"/change-password"}>
-            <img src={assets.people_icon} alt="doctor_list" />
+            <img
+              className="min-w-5"
+              src={assets.people_icon}
+              alt="doctor_list"
+            />
             <p className="hidden md:block">Change Password</p>
           </NavLink>
         </ul>

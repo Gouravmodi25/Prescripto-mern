@@ -11,6 +11,7 @@ const {
   toGetListOfAppointment,
   markAppointmentComplete,
   cancelledAppointmentForDoctor,
+  doctorDashboard,
 } = require("../controller/doctor.controller.js");
 
 const doctorAuthentication = require("../middlewares/doctorAuthentication.js");
@@ -64,5 +65,11 @@ doctorRouter
 doctorRouter
   .route("/cancel-appointment")
   .post(doctorAuthentication, cancelledAppointmentForDoctor);
+
+// get dashboard data
+
+doctorRouter
+  .route("/get-dashboard-data")
+  .get(doctorAuthentication, doctorDashboard);
 
 module.exports = doctorRouter;

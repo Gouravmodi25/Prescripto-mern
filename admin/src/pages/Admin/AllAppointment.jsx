@@ -76,7 +76,10 @@ const AllAppointment = () => {
               {/* Appointment Fees */}
               <p>${item.amount || "0.00"}</p>
               {/* Cancel Appointment */}
-              {item.cancelled ? (
+
+              {item.isComplete && !item.cancelled ? (
+                <p className="text-green-500 text-sm font-medium">Completed</p>
+              ) : item.cancelled ? (
                 <p className="text-red-500 text-sm font-medium">Cancelled</p>
               ) : (
                 <img
@@ -89,9 +92,7 @@ const AllAppointment = () => {
             </div>
           ))
         ) : (
-          <div className="p-6 text-center text-gray-500">
-            No appointments found.
-          </div>
+          <p className="text-center text-gray-500">No appointments found.</p>
         )}
       </div>
     </div>

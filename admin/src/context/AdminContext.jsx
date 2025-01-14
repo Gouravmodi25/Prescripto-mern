@@ -55,7 +55,7 @@ const AdminContextProvider = function (props) {
       );
 
       if (response.data.success) {
-        setAppointments(response.data.data);
+        setAppointments(response.data.data.reverse());
 
         // Update dashData.latestAppointment if needed
         setDashData((prevState) => ({

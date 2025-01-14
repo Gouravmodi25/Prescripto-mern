@@ -7,7 +7,7 @@ const Sidebar = () => {
   const { cookie } = useContext(DoctorContext);
 
   return (
-    <div className="min-h-screen min-w-10 bg-white border-r">
+    <div className="min-h-screen  bg-white border-r">
       {cookie && (
         <ul className="text-[#515151] mt-5">
           <NavLink
@@ -17,7 +17,7 @@ const Sidebar = () => {
               }`
             }
             to={"/doctor-dashboard"}>
-            <img src={assets.home_icon} alt="home_icon" />
+            <img className="min-w-5" src={assets.home_icon} alt="home_icon" />
             <p className="hidden md:block">Dashboard</p>
           </NavLink>
           <NavLink
@@ -27,7 +27,11 @@ const Sidebar = () => {
               }`
             }
             to={"/doctor-appointment"}>
-            <img src={assets.appointment_icon} alt="appointment_icon" />
+            <img
+              className="min-w-5"
+              src={assets.appointment_icon}
+              alt="appointment_icon"
+            />
             <p className="hidden md:block">Appointments</p>
           </NavLink>
           <NavLink
@@ -37,7 +41,11 @@ const Sidebar = () => {
               }`
             }
             to={"/doctor-profile"}>
-            <img src={assets.people_icon} alt="doctor_list" />
+            <img
+              className="min-w-5"
+              src={assets.people_icon}
+              alt="doctor_list"
+            />
             <p className="hidden md:block">Profile</p>
           </NavLink>
           <NavLink
@@ -47,7 +55,11 @@ const Sidebar = () => {
               }`
             }
             to={"/change-password"}>
-            <img src={assets.people_icon} alt="doctor_list" />
+            <img
+              className="min-w-5"
+              src={assets.people_icon}
+              alt="doctor_list"
+            />
             <p className="hidden md:block">Change Password</p>
           </NavLink>
         </ul>

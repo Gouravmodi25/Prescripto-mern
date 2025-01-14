@@ -484,6 +484,49 @@ const cancelledAppointmentForDoctor = asyncHandler(async function (req, res) {
     );
 });
 
+// get dashboard data for doctor
+
+const doctorDashboard = asyncHandler(async (req, res) => {
+  const doctorId = req.doctor._id;
+
+  const appointment = await AppointmentModel.find({ doctorId });
+
+  let earning = 0;
+
+  appointment.forEach((item) => {
+    if (item.refundInitiated) {
+      // If a refund has been initiated, subtract the amount
+      earning -= item.amount;
+    } else if (item.payment || item.isComplete) {
+      // Otherwise, add the amount for completed or paid appointments
+      earning += item.amount;
+    }
+  });
+
+  if (earning < 0) {
+    earning = 0;
+  }
+
+  let patient = [];
+
+  appointment.forEach((item) => {
+    if (!patient.includes(item.userId)) {
+      patient.push(item.userId);
+    }
+  });
+
+  const dashboardData = {
+    earning,
+    appointment: appointment.length,
+    patient: patient.length,
+    latestAppointment: appointment.reverse().slice(0, 5),
+  };
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Successfully fetched Data", dashboardData));
+});
+
 module.exports = {
   changeAvailability,
   getAllDoctors,
@@ -496,4 +539,5 @@ module.exports = {
   toGetListOfAppointment,
   markAppointmentComplete,
   cancelledAppointmentForDoctor,
+  doctorDashboard,
 };
