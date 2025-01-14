@@ -29,11 +29,15 @@ const DoctorList = () => {
   };
 
   useEffect(() => {
-    console.log(cookie);
     if (cookie) {
       getAllDoctor();
-    } // Fetch doctors on component mount
-  }, []);
+      const interval = setInterval(() => {
+        getAllDoctor(); // Periodic fetch
+      }, 5000); // Fetch every 5 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [cookie]);
 
   useEffect(() => {
     console.log(doctors);

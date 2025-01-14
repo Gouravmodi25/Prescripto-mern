@@ -148,7 +148,13 @@ const MyAppointment = () => {
 
   useEffect(() => {
     if (cookie) {
-      getUserAppointment();
+      getUserAppointment(); // Initial fetch
+
+      const interval = setInterval(() => {
+        getUserAppointment(); // Periodic fetch
+      }, 700); // Fetch every 5 seconds
+
+      return () => clearInterval(interval); // Cleanup on unmount
     }
   }, [cookie]);
 

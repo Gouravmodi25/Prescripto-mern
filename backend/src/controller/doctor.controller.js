@@ -5,6 +5,8 @@ const validator = require("validator");
 const ApiError = require("../utils/ApiError.js");
 const sendEmail = require("../utils/sendMail.js");
 const crypto = require("crypto");
+const AppointmentModel = require("../models/appointment.models.js");
+const razorpayInstance = require("../utils/razorpay.js");
 
 // generate access token for admin
 const generateToken = async function (doctor_id) {
@@ -354,6 +356,134 @@ const changePasswordDoctor = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Password Changed Successfully", newDoctor));
 });
 
+// get list of appointment
+
+const toGetListOfAppointment = asyncHandler(async (req, res) => {
+  const doctorId = req.doctor._id;
+
+  console.log(doctorId);
+
+  const appointmentData = await AppointmentModel.find({ doctorId });
+
+  if (!appointmentData) {
+    return res.status(400).json(400, "Failed to fetch Appointment Data");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Successfully fetched Data", appointmentData));
+});
+
+// api to mark appointment complete by doctor
+
+const markAppointmentComplete = asyncHandler(async (req, res) => {
+  const { appointmentId } = req.body;
+
+  const doctorId = req.doctor._id;
+
+  const appointment = await AppointmentModel.findById(appointmentId);
+
+  if (!appointment) {
+    return res.status(400).json(new ApiResponse(400, "Appointment not found"));
+  }
+
+  if (appointment && appointment.doctorId == doctorId) {
+    await AppointmentModel.findByIdAndUpdate(appointmentId, {
+      isComplete: true,
+    });
+
+    const newAppointmentData = await AppointmentModel.findById(appointment._id);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Appointment Marked"), newAppointmentData);
+  } else {
+    return res.status(400).json(new ApiResponse(400, "Failed to marked"));
+  }
+});
+
+// api to cancel appointment by doctor
+
+const cancelledAppointmentForDoctor = asyncHandler(async function (req, res) {
+  const { appointmentId } = req.body;
+  const doctorId = req.doctor._id;
+
+  if (!appointmentId) {
+    return res.status(400).json(new ApiResponse(400, "Invalid appointment ID"));
+  }
+
+  const appointment = await AppointmentModel.findById(appointmentId);
+
+  if (!appointment) {
+    return res.status(400).json(new ApiResponse(400, "Appointment not found"));
+  }
+
+  if (appointment.doctorId.toString() !== doctorId.toString()) {
+    return res.status(403).json(new ApiResponse(403, "Unauthorized access"));
+  }
+
+  const { slotDate, slotTime } = appointment;
+
+  const doctorData = await DoctorModel.findById(doctorId);
+
+  let slotBooked = doctorData.slot_booked;
+
+  if (slotBooked[slotDate]) {
+    slotBooked[slotDate] = slotBooked[slotDate].filter(
+      (item) => item !== slotTime
+    );
+  } else {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Slot date not found in booked slots"));
+  }
+
+  await DoctorModel.findByIdAndUpdate(doctorId, { slot_booked: slotBooked });
+
+  // Refund logic
+  let refundResponse = null;
+
+  if (appointment.payment && appointment.paymentId) {
+    try {
+      const refund = await razorpayInstance.payments.refund(
+        appointment.paymentId,
+        { amount: appointment.amount * 100 }
+      );
+      refundResponse = refund;
+    } catch (error) {
+      console.error("Refund Error:", error.message);
+    }
+  }
+
+  const updatedAppointmentData = await AppointmentModel.findByIdAndUpdate(
+    appointmentId,
+    {
+      cancelled: true,
+      refundInitiated: !!refundResponse,
+      refundDetails: refundResponse,
+    },
+    { new: true }
+  );
+
+  if (!updatedAppointmentData) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, "Failed to update appointment data"));
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        refundResponse
+          ? "Appointment cancelled and refund initiated"
+          : "Appointment cancelled successfully",
+        updatedAppointmentData
+      )
+    );
+});
+
 module.exports = {
   changeAvailability,
   getAllDoctors,
@@ -363,4 +493,7 @@ module.exports = {
   resetPassword,
   logoutDoctor,
   changePasswordDoctor,
+  toGetListOfAppointment,
+  markAppointmentComplete,
+  cancelledAppointmentForDoctor,
 };

@@ -8,6 +8,9 @@ const {
   resetPassword,
   logoutDoctor,
   changePasswordDoctor,
+  toGetListOfAppointment,
+  markAppointmentComplete,
+  cancelledAppointmentForDoctor,
 } = require("../controller/doctor.controller.js");
 
 const doctorAuthentication = require("../middlewares/doctorAuthentication.js");
@@ -43,5 +46,23 @@ doctorRouter.route("/logout-doctor").post(doctorAuthentication, logoutDoctor);
 doctorRouter
   .route("/change-password")
   .post(doctorAuthentication, changePasswordDoctor);
+
+// get appointment data
+
+doctorRouter
+  .route("/get-appointment-data")
+  .post(doctorAuthentication, toGetListOfAppointment);
+
+// marked appointment
+
+doctorRouter
+  .route("/complete-appointment")
+  .post(doctorAuthentication, markAppointmentComplete);
+
+// cancelled appointment
+
+doctorRouter
+  .route("/cancel-appointment")
+  .post(doctorAuthentication, cancelledAppointmentForDoctor);
 
 module.exports = doctorRouter;

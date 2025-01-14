@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import Cookies from "js-cookie";
 // import { doctors } from "../assets/assets";
 
 export const AppContext = createContext(null);
@@ -70,7 +69,7 @@ const AppContextProvider = (props) => {
   }, [cookie]);
 
   useEffect(() => {
-    const savedToken = Cookies.get("accessToken");
+    const savedToken = localStorage.getItem("access-token");
     if (savedToken) {
       setCookie(savedToken);
     }

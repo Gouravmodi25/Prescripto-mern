@@ -35,10 +35,12 @@ const AppContextProvider = function (props) {
     }`;
   };
 
-  const value = { calculateAge, slotDateFormat };
+  // const value = { calculateAge, slotDateFormat };
 
   return (
-    <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
+    <AppContext.Provider value={{ calculateAge, slotDateFormat }}>
+      {props.children}
+    </AppContext.Provider>
   );
 };
 

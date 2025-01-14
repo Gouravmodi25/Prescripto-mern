@@ -1,8 +1,12 @@
+// import { useState } from "react";
 import { createContext } from "react";
+// import { axios } from 'axios';
 
 export const DoctorContext = createContext();
 
 const DoctorContextProvider = function (props) {
+  // get appointment data of doctor
+
   const value = {};
 
   return (

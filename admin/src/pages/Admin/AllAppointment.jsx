@@ -12,8 +12,13 @@ const AllAppointment = () => {
   useEffect(() => {
     if (cookie) {
       getAllAppointments();
+      const interval = setInterval(() => {
+        getAllAppointments(); // Periodic fetch
+      }, 5000); // Fetch every 5 seconds
+
+      return () => clearInterval(interval);
     }
-  }, [cookie, getAllAppointments]);
+  }, [cookie]);
 
   return (
     <div className="w-full max-w-6xl m-3">

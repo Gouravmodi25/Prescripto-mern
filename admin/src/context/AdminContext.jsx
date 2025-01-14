@@ -1,6 +1,5 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 
 export const AdminContext = createContext();
@@ -134,7 +133,7 @@ const AdminContextProvider = function (props) {
   };
 
   useEffect(() => {
-    const savedToken = Cookies.get("accessToken");
+    const savedToken = localStorage.getItem("access-token");
     if (savedToken) {
       setCookie(savedToken);
     }
