@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { AppContext } from "../context/AppContext.jsx";
 import { toast } from "react-toastify";
-import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -32,10 +31,9 @@ const Login = () => {
         );
 
         console.log(data);
-        const cookie = Cookies.get("accessToken");
         if (data.data.success) {
-          localStorage.setItem("access-token", cookie);
-          setCookie(cookie);
+          localStorage.setItem("access-token", data.data.data.accessToken);
+          setCookie(data.data.data.accessToken);
           toast.success(data.data.message);
           navigate("/");
         } else {
@@ -55,11 +53,9 @@ const Login = () => {
           }
         );
 
-        const cookie = Cookies.get("accessToken");
-
         if (data.data.success) {
-          localStorage.setItem("access-token", cookie);
-          setCookie(cookie);
+          localStorage.setItem("access-token", data.data.data.accessToken);
+          setCookie(data.data.data.accessToken);
           toast.success(data.data.message);
           navigate("/");
         } else {

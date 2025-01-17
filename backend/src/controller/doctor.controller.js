@@ -519,7 +519,7 @@ const doctorDashboard = asyncHandler(async (req, res) => {
     earning,
     appointment: appointment.length,
     patient: patient.length,
-    latestAppointment: appointment.reverse().slice(0, 5),
+    latestAppointment: appointment.reverse(),
   };
 
   return res

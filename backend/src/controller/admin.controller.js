@@ -549,7 +549,7 @@ const toGetAdminDashboard = asyncHandler(async (req, res) => {
       doctors: doctorData.length,
       patient: userData.length,
       appointments: appointmentData.length,
-      latestAppointment: appointmentData.reverse().slice(0, 5),
+      latestAppointment: appointmentData.reverse(),
     };
 
     return res

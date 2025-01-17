@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import { AdminContext } from "../context/AdminContext";
 import axios from "axios";
 import { toast } from "react-toastify";
-import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
 
 const AdminLogin = () => {
@@ -28,12 +27,10 @@ const AdminLogin = () => {
             withCredentials: true, // Ensures the cookie is sent with the request
           }
         );
-        const cookie = Cookies.get("accessToken");
-        console.log(cookie);
-        console.log(data);
+
         if (data.data.success) {
-          localStorage.setItem("access-token", cookie);
-          setCookie(cookie);
+          localStorage.setItem("access-token", data.data.data.accessToken);
+          setCookie(data.data.data.accessToken);
           toast.success(data.data.message);
           console.log(data.data.data);
         } else {
@@ -52,13 +49,11 @@ const AdminLogin = () => {
             withCredentials: true, // Ensures the cookie is sent with the request
           }
         );
-        const cookie = Cookies.get("accessToken");
-        console.log(cookie);
 
         console.log(data.data.message);
         if (data.data.success) {
-          localStorage.setItem("access-token", cookie);
-          setCookie(cookie);
+          localStorage.setItem("access-token", data.data.data.accessToken);
+          setCookie(data.data.data.accessToken);
           toast.success(data.data.message);
           console.log(data);
         } else {
