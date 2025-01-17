@@ -170,7 +170,11 @@ const Appointment = () => {
   }, [docInfo]);
 
   useEffect(() => {
-    getAllDoctor();
+    const interval = setInterval(() => {
+      getAllDoctor(); // Fetch the latest doctor data periodically
+    }, 400); // Fetch every 10 seconds
+
+    return () => clearInterval(interval); // Cleanup on component unmount
   }, []);
 
   useEffect(() => {

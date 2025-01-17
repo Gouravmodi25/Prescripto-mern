@@ -38,7 +38,7 @@ const DoctorAppointment = () => {
       <button
         onClick={() => {
           getAppointmentData();
-          toast.success("Refreshed Appoinment Data");
+          toast.success("Refreshed Appointment Data");
           window.location.reload();
         }}
         className="mb-3 px-4 py-2 bg-blue-500 text-white rounded">

@@ -36,6 +36,10 @@ const Navbar = () => {
       // Handle API response
       if (response.data.success) {
         toast.success(response.data.message || "Logged out successfully!");
+        Cookies.remove("accessToken");
+        localStorage.removeItem("access-token");
+        navigate("/login");
+        setCookie("");
       } else {
         toast.warn("Logout API responded but did not succeed.");
       }

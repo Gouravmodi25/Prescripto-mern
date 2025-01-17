@@ -497,7 +497,7 @@ const doctorDashboard = asyncHandler(async (req, res) => {
     if (item.refundInitiated) {
       // If a refund has been initiated, subtract the amount
       earning -= item.amount;
-    } else if (item.payment || item.isComplete) {
+    } else if (item.payment && item.isComplete) {
       // Otherwise, add the amount for completed or paid appointments
       earning += item.amount;
     }
@@ -527,6 +527,76 @@ const doctorDashboard = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Successfully fetched Data", dashboardData));
 });
 
+// to get doctor profile
+
+const doctorProfile = asyncHandler(async (req, res) => {
+  try {
+    const doctorId = req.doctor._id;
+
+    const profileData = await DoctorModel.findById(doctorId).select(
+      "-password"
+    );
+
+    if (!profileData) {
+      return res.status(404).json(new ApiResponse(404, "Doctor Not Found"));
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Fetched Doctor Profile", profileData));
+  } catch (error) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Failed to fetched Profile"));
+  }
+});
+
+// update profile of doctor
+
+const updateProfileDoctor = asyncHandler(async (req, res) => {
+  const doctorId = req.doctor._id;
+
+  const { fees, availability, address } = req.body;
+
+  if (
+    [fees, availability, address].some(
+      (item) => String(item || "").trim() == ""
+    )
+  ) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "All Fields are required"));
+  }
+
+  if (!["Available", "Unavailable", "On Leave"].includes(availability)) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Please Enter valid status"));
+  }
+
+  const updatedDoctor = await DoctorModel.findByIdAndUpdate(
+    doctorId,
+    {
+      fees,
+      availability,
+      address,
+    },
+    {
+      new: true,
+    }
+  );
+
+  if (!updatedDoctor) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Error While Update Profile"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Profile Updated", updatedDoctor));
+});
+
 module.exports = {
   changeAvailability,
   getAllDoctors,
@@ -540,4 +610,6 @@ module.exports = {
   markAppointmentComplete,
   cancelledAppointmentForDoctor,
   doctorDashboard,
+  doctorProfile,
+  updateProfileDoctor,
 };

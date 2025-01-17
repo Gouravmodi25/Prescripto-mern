@@ -16,6 +16,10 @@ const DoctorContextProvider = (props) => {
 
   const [appointmentData, setAppointmentData] = useState([]);
 
+  const [dashData, setDashData] = useState(false);
+
+  const [profileData, setProfileData] = useState(false);
+
   const getAppointmentData = async () => {
     try {
       const data = await axios.post(
@@ -95,6 +99,49 @@ const DoctorContextProvider = (props) => {
     }
   };
 
+  // get dash data
+
+  const getDashData = async () => {
+    try {
+      const data = await axios.get(
+        `${backendUrl}/api/doctor/get-dashboard-data`,
+        {
+          headers: {
+            Authorization: cookie,
+          },
+        }
+      );
+
+      if (data.data.success) {
+        console.log(data.data.data);
+        setDashData(data.data.data);
+      } else {
+        toast.error(data.data.data);
+      }
+    } catch (error) {
+      toast.error(error.response?.data.data);
+    }
+  };
+
+  const getProfileData = async () => {
+    try {
+      const data = await axios.get(`${backendUrl}/api/doctor/fetch-profile`, {
+        headers: {
+          Authorization: cookie,
+        },
+      });
+
+      console.log(data);
+      if (data.data.success) {
+        setProfileData(data.data.data);
+      } else {
+        toast.error(data.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data.message);
+    }
+  };
+
   const value = {
     cookie,
     setCookie,
@@ -104,6 +151,12 @@ const DoctorContextProvider = (props) => {
     getAppointmentData,
     completeAppointment,
     cancelAppointment,
+    dashData,
+    setDashData,
+    getDashData,
+    profileData,
+    setProfileData,
+    getProfileData,
   };
 
   useEffect(() => {

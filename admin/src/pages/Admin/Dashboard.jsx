@@ -20,6 +20,11 @@ const Dashboard = () => {
   useEffect(() => {
     if (cookie) {
       toGetDashboardData();
+      const interval = setInterval(() => {
+        toGetDashboardData(); // Periodic fetch
+      }, 700); // Fetch every 5 seconds
+
+      return () => clearInterval(interval);
     }
   }, [cookie]);
 

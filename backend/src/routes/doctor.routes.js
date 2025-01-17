@@ -12,6 +12,8 @@ const {
   markAppointmentComplete,
   cancelledAppointmentForDoctor,
   doctorDashboard,
+  doctorProfile,
+  updateProfileDoctor,
 } = require("../controller/doctor.controller.js");
 
 const doctorAuthentication = require("../middlewares/doctorAuthentication.js");
@@ -71,5 +73,15 @@ doctorRouter
 doctorRouter
   .route("/get-dashboard-data")
   .get(doctorAuthentication, doctorDashboard);
+
+// fetched profile
+
+doctorRouter.route("/fetch-profile").get(doctorAuthentication, doctorProfile);
+
+// profile updated
+
+doctorRouter
+  .route("/update-profile-doctor")
+  .patch(doctorAuthentication, updateProfileDoctor);
 
 module.exports = doctorRouter;

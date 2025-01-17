@@ -14,7 +14,7 @@ const AllAppointment = () => {
       getAllAppointments();
       const interval = setInterval(() => {
         getAllAppointments(); // Periodic fetch
-      }, 5000); // Fetch every 5 seconds
+      }, 700); // Fetch every 5 seconds
 
       return () => clearInterval(interval);
     }
