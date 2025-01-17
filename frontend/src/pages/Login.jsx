@@ -31,6 +31,7 @@ const Login = () => {
           }
         );
 
+        console.log(data);
         const cookie = Cookies.get("accessToken");
         if (data.data.success) {
           localStorage.setItem("access-token", cookie);
@@ -53,7 +54,13 @@ const Login = () => {
             withCredentials: true,
           }
         );
+
+        console.log(data);
+
         const cookie = Cookies.get("accessToken");
+
+        console.log(cookie);
+
         if (data.data.success) {
           localStorage.setItem("access-token", cookie);
           setCookie(cookie);

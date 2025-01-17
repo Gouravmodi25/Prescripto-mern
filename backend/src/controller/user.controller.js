@@ -128,6 +128,9 @@ const userLogin = asyncHandler(async function (req, res) {
 
   const options = {
     secure: true,
+    sameSite: "None", // Required for cross-origin requests
+    domain: "https://prescripto-by-gourav.onrender.com", // Update with your domain
+    path: "/",
   };
 
   const loggedUser = await UserModel.findById(user._id).select("-password");
