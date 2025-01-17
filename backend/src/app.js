@@ -13,7 +13,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5174",
-  "https://prescrpito-gourav.netlify.app/doctors",
+  "https://prescrpito-gourav.netlify.app",
   "http://localhost:5175",
 ]; // Add your allowed origins here
 
