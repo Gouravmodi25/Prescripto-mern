@@ -12,9 +12,9 @@ const app = express();
 // cors middleware
 
 const allowedOrigins = [
-  "https://prescrito-admin-panel.netlify.app/",
+  "https://prescrito-admin-panel.netlify.app",
   "https://prescrpito-gourav.netlify.app",
-  "https://prescripto-doctor-panel.onrender.com/",
+  "https://prescripto-doctor-panel.onrender.com",
 ]; // Add your allowed origins here
 
 const corsOptions = {
