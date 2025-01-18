@@ -195,8 +195,6 @@ const forgotPassword = asyncHandler(async function (req, res) {
 
   const resetToken = doctor.getResetPasswordToken();
 
-  console.log(resetToken);
-
   await doctor.save({ validateBeforeSave: true });
 
   const resetUrl = `http://localhost:5175/reset-password/${resetToken}`;
@@ -215,8 +213,6 @@ const forgotPassword = asyncHandler(async function (req, res) {
     });
 
     const newDoctor = await DoctorModel.findOne(doctor._id).select("-password");
-
-    console.log(newDoctor);
 
     return res
       .status(200)
@@ -266,15 +262,10 @@ const resetPassword = asyncHandler(async (req, res) => {
     .update(req.params.resetToken)
     .digest("hex");
 
-  console.log("Reset token received:", req.params.resetToken);
-  console.log("Hashed reset token:", resetPasswordToken);
-
   const doctor = await DoctorModel.findOne({
     resetPasswordToken: resetPasswordToken,
     resetPasswordTokenExpiry: { $gt: Date.now() },
   });
-
-  console.log("Doctor found in database:", doctor);
 
   if (!doctor) {
     return res.status(400).json(new ApiResponse(400, "Invalid Reset Token"));
@@ -360,8 +351,6 @@ const changePasswordDoctor = asyncHandler(async (req, res) => {
 
 const toGetListOfAppointment = asyncHandler(async (req, res) => {
   const doctorId = req.doctor._id;
-
-  console.log(doctorId);
 
   const appointmentData = await AppointmentModel.find({ doctorId });
 

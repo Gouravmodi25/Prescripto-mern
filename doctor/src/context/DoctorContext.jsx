@@ -33,7 +33,6 @@ const DoctorContextProvider = (props) => {
       );
 
       if (data.data.success) {
-        console.log(data.data.data);
         setAppointmentData(data.data.data.reverse());
       } else {
         toast.error(data.data.message);
@@ -113,7 +112,6 @@ const DoctorContextProvider = (props) => {
       );
 
       if (data.data.success) {
-        console.log(data.data.data);
         setDashData(data.data.data);
       } else {
         toast.error(data.data.data);
@@ -131,7 +129,6 @@ const DoctorContextProvider = (props) => {
         },
       });
 
-      console.log(data);
       if (data.data.success) {
         setProfileData(data.data.data);
       } else {

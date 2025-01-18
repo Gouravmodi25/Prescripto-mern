@@ -17,7 +17,7 @@ const DoctorAppointment = () => {
 
   //   const { calculateAge, slotDateFormat } = useContext(AppContext);
 
-  //   console.log(calculateAge);
+  //
 
   const { calculateAge, slotDateFormat } = useContext(AppContext);
 

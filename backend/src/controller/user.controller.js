@@ -51,8 +51,6 @@ const registerUser = asyncHandler(async function (req, res) {
 
   const existedUser = await UserModel.findOne({ email });
 
-  console.log(existedUser);
-
   if (existedUser) {
     return res
       .status(400)
@@ -72,7 +70,6 @@ const registerUser = asyncHandler(async function (req, res) {
   });
 
   const accessToken = await generateToken(createdUser._id);
-  console.log(accessToken);
 
   const options = {
     secure: true,
@@ -261,8 +258,6 @@ const userResetPassword = asyncHandler(async (req, res) => {
     resetPasswordToken,
     resetPasswordTokenExpiry: { $gt: Date.now() },
   });
-
-  console.log(resetPasswordToken);
 
   if (!user) {
     return res.status(400).json(new ApiResponse(400, "Invalid Reset Token"));
@@ -537,11 +532,7 @@ const toCancelledAppointment = asyncHandler(async function (req, res) {
 
   const userId = req.user._id;
 
-  console.log(userId);
-
   const appointmentData = await AppointmentModel.findById(appointmentId);
-
-  console.log(appointmentData);
 
   if (appointmentData.userId !== userId.toString()) {
     return res.status(400).json(new ApiResponse(400, "Unauthorized Action"));
@@ -560,8 +551,6 @@ const toCancelledAppointment = asyncHandler(async function (req, res) {
   slotBooked[slotDate] = slotBooked[slotDate].filter(
     (item) => item != slotTime
   );
-
-  console.log(slotBooked);
 
   await DoctorModel.findByIdAndUpdate(doctorId, { slot_booked: slotBooked });
 
@@ -585,8 +574,6 @@ const toCancelledAppointment = asyncHandler(async function (req, res) {
         .json(new ApiResponse(500, "Error initiating refund", error.message));
     }
   }
-
-  console.log(refundResponse);
 
   const updatedAppointmentData = await AppointmentModel.findByIdAndUpdate(
     appointmentId,
@@ -642,8 +629,6 @@ const verifyPayment = asyncHandler(async function (req, res) {
   const { razorpay_order_id, razorpay_payment_id } = req.body;
 
   const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
-
-  console.log(orderInfo);
 
   if (orderInfo.status === "paid") {
     await AppointmentModel.findByIdAndUpdate(orderInfo.receipt, {

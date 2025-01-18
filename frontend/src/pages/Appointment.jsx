@@ -114,8 +114,6 @@ const Appointment = () => {
         }
       );
 
-      console.log(data);
-
       if (data.data.success) {
         toast.success(data.data.message);
         getAllDoctor();
@@ -123,11 +121,8 @@ const Appointment = () => {
       } else {
         toast.error(data.data.message);
       }
-
-      console.log(slotDate);
     } catch (error) {
       toast.error(error.response?.data.message);
-      console.log(error);
     }
   };
 
@@ -136,7 +131,6 @@ const Appointment = () => {
   const getBookedSlots = async () => {
     try {
       if (!docSlots.length || !docSlots[slotIndex] || !docSlots[slotIndex][0]) {
-        console.log("docSlots or slotIndex is invalid. Skipping fetch.");
         return;
       }
       let date = docSlots[slotIndex][0].date;
@@ -151,7 +145,6 @@ const Appointment = () => {
         `${backendUrl}/api/doctor/get-booked-slot?doctorId=${doctorId}&date=${slotDate}`
       );
 
-      console.log(response);
       if (response.data.success) {
         const { date, slots } = response.data.data;
         setBookedSlots((prev) => ({ ...prev, [date]: slots }));
@@ -179,14 +172,11 @@ const Appointment = () => {
 
   useEffect(() => {
     if (docSlots.length && docSlots[slotIndex]?.length) {
-      console.log("Fetching booked slots...");
       getBookedSlots();
     }
   }, [docSlots, slotIndex]);
 
-  useEffect(() => {
-    console.log(docSlots);
-  }, [docSlots]);
+  useEffect(() => {}, [docSlots]);
 
   if (!docInfo) {
     return <p>Loading doctor details...</p>; // Or a better loading state
@@ -269,7 +259,7 @@ const Appointment = () => {
 
                 const isBooked =
                   bookedSlots[date] && bookedSlots[date].includes(item.time);
-                // console.log(isBooked);
+                //
                 return (
                   <p
                     onClick={() => !isBooked && setSLotTime(item.time)} // Only allow clicking on available slots

@@ -30,7 +30,6 @@ const Login = () => {
           }
         );
 
-        console.log(data);
         if (data.data.success) {
           localStorage.setItem("access-token", data.data.data.accessToken);
           setCookie(data.data.data.accessToken);

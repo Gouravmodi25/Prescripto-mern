@@ -60,7 +60,6 @@ const AppContextProvider = (props) => {
   };
 
   useEffect(() => {
-    console.log(cookie);
     if (cookie) {
       loadUserData();
     } else {

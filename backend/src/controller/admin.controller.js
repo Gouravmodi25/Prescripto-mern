@@ -26,7 +26,6 @@ const generateToken = async function (admin_id) {
 
 // controller for adding doctors
 const addDoctor = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const {
     fullName,
     email,
@@ -73,8 +72,6 @@ const addDoctor = asyncHandler(async (req, res) => {
     $or: [{ email }],
   });
 
-  console.log(existedUser);
-
   if (existedUser) {
     return res
       .status(400)
@@ -91,8 +88,6 @@ const addDoctor = asyncHandler(async (req, res) => {
 
   const profile_imageLocalPath = req.file?.path;
 
-  console.log("profile_imageLocalPath", profile_imageLocalPath);
-
   if (!profile_imageLocalPath) {
     return res
       .status(400)
@@ -100,8 +95,6 @@ const addDoctor = asyncHandler(async (req, res) => {
   }
 
   const profile_Image = await uploadOnCloudinary(profile_imageLocalPath);
-
-  console.log("profile Image CLoudinary", profile_Image);
 
   if (!profile_Image) {
     return res
@@ -341,8 +334,6 @@ const resetPassword = asyncHandler(async (req, res) => {
     resetPasswordTokenExpiry: { $gt: Date.now() },
   });
 
-  console.log(resetPasswordToken);
-
   if (!admin) {
     return res.status(400).json(new ApiResponse(400, "Invalid Reset Token"));
   }
@@ -432,7 +423,6 @@ const getAllDoctor = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, "Successfully Get All Doctor", doctor));
   } catch (error) {
-    console.log(error);
     return res
       .status(400)
       .json(new ApiResponse(400, "Error While Retrieving Doctor "));
@@ -472,8 +462,6 @@ const toCancelledAppointment = asyncHandler(async function (req, res) {
 
   const appointmentData = await AppointmentModel.findById(appointmentId);
 
-  console.log(appointmentData);
-
   await AppointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true });
 
   // releasing doctor slot
@@ -487,8 +475,6 @@ const toCancelledAppointment = asyncHandler(async function (req, res) {
   slotBooked[slotDate] = slotBooked[slotDate].filter(
     (item) => item != slotTime
   );
-
-  console.log(slotBooked);
 
   await DoctorModel.findByIdAndUpdate(doctorId, { slot_booked: slotBooked });
 
@@ -512,8 +498,6 @@ const toCancelledAppointment = asyncHandler(async function (req, res) {
         .json(new ApiResponse(500, "Error initiating refund", error.message));
     }
   }
-
-  console.log(refundResponse);
 
   const updatedAppointmentData = await AppointmentModel.findByIdAndUpdate(
     appointmentId,

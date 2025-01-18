@@ -32,7 +32,6 @@ const AdminLogin = () => {
           localStorage.setItem("access-token", data.data.data.accessToken);
           setCookie(data.data.data.accessToken);
           toast.success(data.data.message);
-          console.log(data.data.data);
         } else {
           toast.error(data.data.message);
         }
@@ -50,12 +49,10 @@ const AdminLogin = () => {
           }
         );
 
-        console.log(data.data.message);
         if (data.data.success) {
           localStorage.setItem("access-token", data.data.data.accessToken);
           setCookie(data.data.data.accessToken);
           toast.success(data.data.message);
-          console.log(data);
         } else {
           toast.error(data.data.message);
         }
@@ -72,9 +69,7 @@ const AdminLogin = () => {
     setShowPassword((prev) => !prev);
   };
 
-  useEffect(() => {
-    console.log(cookie);
-  }, [cookie]);
+  useEffect(() => {}, [cookie]);
 
   return (
     <form

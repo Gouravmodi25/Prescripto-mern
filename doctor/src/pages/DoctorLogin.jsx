@@ -29,7 +29,6 @@ const DoctorLogin = () => {
         localStorage.setItem("access-token", data.data.data.accessToken);
         setCookie(data.data.data.accessToken);
         toast.success(data.data.message);
-        console.log(data.data.data);
       } else {
         toast.error(data.data.message);
       }
@@ -42,9 +41,7 @@ const DoctorLogin = () => {
     setShowPassword((prev) => !prev);
   };
 
-  useEffect(() => {
-    console.log(cookie);
-  }, [cookie]);
+  useEffect(() => {}, [cookie]);
   return (
     <form
       onSubmit={(event) => onSubmitHandler(event)}
