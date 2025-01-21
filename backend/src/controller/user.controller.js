@@ -188,7 +188,7 @@ const userForgotPassword = asyncHandler(async (req, res) => {
 
   await user.save({ validateBeforeSave: false });
 
-  const resetPasswordUrl = `http:localhost:5173/reset-password/${resetPasswordToken}`;
+  const resetPasswordUrl = `https://prescripto-by-gourav.onrender.com/${resetPasswordToken}`;
 
   const message = `
       <h1>This message is from Prescripto Project</h1>
