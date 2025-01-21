@@ -188,7 +188,7 @@ const userForgotPassword = asyncHandler(async (req, res) => {
 
   await user.save({ validateBeforeSave: false });
 
-  const resetPasswordUrl = `https://prescrpito-gourav.netlify.app/${resetPasswordToken}`;
+  const resetPasswordUrl = `https://prescrpito-gourav.netlify.app/reset-password/${resetPasswordToken}`;
 
   const message = `
       <h1>This message is from Prescripto Project</h1>
