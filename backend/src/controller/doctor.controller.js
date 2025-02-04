@@ -483,12 +483,12 @@ const doctorDashboard = asyncHandler(async (req, res) => {
   let earning = 0;
 
   appointment.forEach((item) => {
-    if (item.refundInitiated) {
+    if (item.payment && item.isComplete) {
       // If a refund has been initiated, subtract the amount
-      earning -= item.amount;
-    } else if (item.payment && item.isComplete) {
-      // Otherwise, add the amount for completed or paid appointments
       earning += item.amount;
+    } else if (item.refundInitiated) {
+      // Otherwise, add the amount for completed or paid appointments
+      earning -= item.amount;
     }
   });
 
